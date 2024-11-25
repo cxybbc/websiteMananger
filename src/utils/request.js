@@ -2,8 +2,8 @@ import axios from 'axios'
 import ElementUI from "element-ui";
 import router from "@/router/index.js";
 const request = axios.create({
-    baseURL: 'https://websitemanage.biggerlens.cn:18060'
-    // baseURL: 'http://127.0.0.1:18061'
+    // baseURL: 'https://websitemanage.biggerlens.cn:18060'
+    baseURL: 'http://192.168.31.36:18060'
 })
 
 // request 拦截器
@@ -36,7 +36,7 @@ request.interceptors.response.use(
             res = res ? JSON.parse(res) : res
         }
         //当权限验证不通过时候给出提示
-        if (res.code ==='401'){
+        if (res.code === '401') {
             localStorage.removeItem("user")
             router.push("/login");
         }
