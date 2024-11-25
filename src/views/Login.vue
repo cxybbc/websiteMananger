@@ -10,17 +10,11 @@
 
         <!-- 右侧的注册盒子 -->
         <div class="loginbox-in">
-          <el-form
-            :model="user"
-            :rules="rules"
-            ref="userForm"
-            style="margin-left: 0px !important"
-          >
-            <el-form-item prop="username" style="margin-left: 0px !important">
+          <el-form :model="user" :rules="rules" ref="userForm">
+            <el-form-item prop="username">
               <div class="userbox">
                 <span class="iconfont">&#58905;</span>
                 <el-input
-                  style="margin-left: 0px !important"
                   v-model="user.username"
                   placeholder="用户名"
                 ></el-input>
@@ -30,7 +24,6 @@
               <div class="pwdbox">
                 <span class="iconfont">&#58933;</span>
                 <el-input
-                  style="margin-left: 0px !important"
                   show-password
                   v-model="user.password"
                   placeholder="密码"
@@ -158,6 +151,8 @@ export default {
 .loginbox-in {
   background-color: #89ab9e;
   width: 240px;
+  box-sizing: border-box;
+  padding: 0 12px;
 }
 
 /*.userbox>>> .el-input__inner {*/
@@ -170,13 +165,11 @@ export default {
   height: 30px;
   width: 200px;
   display: flex;
-  margin-left: 25px;
 }
 .pwdbox {
   height: 30px;
   width: 200px;
   display: flex;
-  margin-left: 25px;
 }
 
 .background {
