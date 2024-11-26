@@ -43,6 +43,7 @@
 
           <el-form-item label="国际化" prop="localization">
             <el-input
+              :disabled="true"
               v-model="productSetform.localization"
               placeholder='例如：{ "en": "Hot recommended" }'
             />
@@ -182,11 +183,12 @@
     >
       <div class="productapp_content" style="height: 500px">
         <el-form
+          ref="productForm"
           :model="productMiddleSetform"
           :rules="productMiddleSetformRules"
         >
           <!-- 产品名称 -->
-          <el-form-item label="产品名称" class="form-item">
+          <el-form-item label="产品名称" prop="name" class="form-item">
             <el-input
               v-model="productMiddleSetform.name"
               placeholder="请输入产品名称"
@@ -194,28 +196,40 @@
           </el-form-item>
 
           <!-- 名称国际化 -->
-          <el-form-item label="名称国际化" class="form-item">
-            <el-input v-model="productMiddleSetform.internationalName" />
+          <el-form-item
+            label="名称国际化"
+            prop="internationalName"
+            class="form-item"
+          >
+            <el-input
+              :disabled="true"
+              style="width: 500px"
+              v-model="productMiddleSetform.internationalName"
+            />
             <el-button type="primary" @click="handleEdit('productNameEdit')"
               >编辑</el-button
             >
           </el-form-item>
 
           <!-- 产品简介 -->
-          <el-form-item label="产品简介" class="form-item">
+          <el-form-item label="产品简介" prop="info" class="form-item">
             <el-input v-model="productMiddleSetform.info" />
           </el-form-item>
 
           <!-- 简介国际化 -->
-          <el-form-item label="简介国际化">
-            <el-input v-model="productMiddleSetform.internationalInfo" />
+          <el-form-item label="简介国际化" prop="internationalInfo">
+            <el-input
+              :disabled="true"
+              style="width: 500px"
+              v-model="productMiddleSetform.internationalInfo"
+            />
             <el-button type="primary" @click="handleEdit('productDetailEdit')"
               >编辑</el-button
             >
           </el-form-item>
 
           <!-- 产品LOGO -->
-          <el-form-item label="产品LOGO">
+          <el-form-item label="产品LOGO" prop="logo">
             <el-input
               v-if="middlelogobase64"
               v-model="middlelogobase64"
@@ -242,14 +256,19 @@
                 size="small"
                 type="danger"
                 v-if="middlelogobase64"
+                @click="handleReplaceClick"
                 >替换图片</el-button
               >
             </el-upload>
           </el-form-item>
 
           <!-- 下载渠道 -->
-          <el-form-item label="下载渠道">
-            <el-input v-model="productMiddleSetform.download" />
+          <el-form-item label="下载渠道" prop="download">
+            <el-input
+              :disabled="true"
+              style="width: 500px"
+              v-model="productMiddleSetform.download"
+            />
             <el-button type="primary" @click="handleDownloadEdit()"
               >编辑</el-button
             >
@@ -260,11 +279,23 @@
             <el-input type="number" v-model="productMiddleSetform.uiSize" />
           </el-form-item>
 
+          <el-form-item label="官网链接">
+            <el-input
+              :disabled="true"
+              style="width: 500px"
+              v-model="productMiddleSetform.websiteUrl"
+            ></el-input>
+            <el-button type="primary" @click="handleEdit('productWebsiteEdit')"
+              >编辑</el-button
+            >
+          </el-form-item>
+
           <!-- UI背景图 -->
           <el-form-item label="UI背景图">
             <el-input
               v-if="middlebackgroupbase64"
               v-model="middlebackgroupbase64"
+              width="300px"
             />
             <el-upload
               ref="upload2"
@@ -276,17 +307,18 @@
               :auto-upload="false"
             >
               <el-button
-                v-if="!middlebackgroupbase64"
                 slot="trigger"
+                v-if="!middlebackgroupbase64"
                 size="small"
                 type="primary"
                 >+ 添加图片</el-button
               >
               <el-button
-                v-if="middlebackgroupbase64"
                 slot="trigger"
+                v-if="middlebackgroupbase64"
                 size="small"
                 type="danger"
+                @click="handleReplaceClick2"
                 >替换图片</el-button
               >
             </el-upload>
@@ -357,7 +389,9 @@
         <el-button type="danger" @click="previewcenterdelete"
           >删除所选</el-button
         >
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="isproductPreview = false"
+          >保存</el-button
+        >
       </div>
     </el-dialog>
 
@@ -639,6 +673,7 @@ export default {
         internationalInfo: "",
         download: "",
         uiSize: "",
+        websiteUrl: "",
       },
       middlelogobase64: "",
       middlebackgroupbase64: "",
@@ -652,9 +687,8 @@ export default {
       },
       productMiddleSetformRules: {
         name: [{ required: true, message: "请输入产品名称", trigger: "blur" }],
-        internationalName: [
-          { required: true, message: "请输入名称国际化", trigger: "blur" },
-        ],
+
+        info: [{ required: true, message: "请输入产品简介", trigger: "blur" }],
       },
 
       Localizationfrom: [
@@ -865,13 +899,38 @@ export default {
       this.LocalizationType = type;
       if (type === "productCategoryEdit") {
         this.productTitle = "分类名称国际化";
-        this.Localizationfrom = [{ language: "", content: "" }];
+        if (this.productSetform.localization) {
+          this.Localizationfrom = JSON.parse(this.productSetform.localization);
+        } else {
+          this.Localizationfrom = [{ language: "", content: "" }];
+        }
       } else if (type === "productNameEdit") {
         this.productTitle = "产品名称国际化";
-        this.Localizationfrom = [{ language: "", content: "" }];
+        if (this.productMiddleSetform.internationalName) {
+          this.Localizationfrom = JSON.parse(
+            this.productMiddleSetform.internationalName
+          );
+        } else {
+          this.Localizationfrom = [{ language: "", content: "" }];
+        }
       } else if (type === "productDetailEdit") {
         this.productTitle = "简介国际化";
-        this.Localizationfrom = [{ language: "", content: "" }];
+        if (this.productMiddleSetform.internationalInfo) {
+          this.Localizationfrom = JSON.parse(
+            this.productMiddleSetform.internationalInfo
+          );
+        } else {
+          this.Localizationfrom = [{ language: "", content: "" }];
+        }
+      } else if (type === "productWebsiteEdit") {
+        this.productTitle = "官网链接";
+        if (this.productMiddleSetform.websiteUrl) {
+          this.Localizationfrom = JSON.parse(
+            this.productMiddleSetform.websiteUrl
+          );
+        } else {
+          this.Localizationfrom = [{ language: "", content: "" }];
+        }
       }
       this.isProductCateEditDialog = true;
     },
@@ -895,6 +954,11 @@ export default {
         this.productMiddleSetform.internationalInfo = JSON.stringify(
           this.Localizationfrom
         );
+      } else if (this.LocalizationType === "productWebsiteEdit") {
+        this.isProductCateEditDialog = false;
+        this.productMiddleSetform.websiteUrl = JSON.stringify(
+          this.Localizationfrom
+        );
       }
     },
     //保存下载渠道
@@ -905,6 +969,11 @@ export default {
 
     //下载渠道编辑保存
     handleDownloadEdit() {
+      if (this.downloadfrom) {
+        this.productMiddleSetform.download = JSON.stringify(this.downloadfrom);
+      } else {
+        this.productMiddleSetform.download = "";
+      }
       this.isProductMiddleDowndialog = true;
     },
 
@@ -982,9 +1051,13 @@ export default {
           internationalInfo: "",
           logo: "",
           uiSize: "",
-          uiBackgroup: "",
+          uiBackGround: "",
           download: "",
+          websiteUrl: "",
         };
+        this.downloadfrom = [
+          { downloadType: "", downloadUrl: "" }, // 初始一行数据
+        ];
         this.middlebackgroupbase64 = "";
         this.middlelogobase64 = "";
         this.bgList = [];
@@ -1002,6 +1075,7 @@ export default {
               internationalInfo: res.data.middleInfo.international_info,
               uiSize: res.data.middleInfo.ui_size,
               download: res.data.middleInfo.download,
+              websiteUrl: res.data.middleInfo.website_url,
             };
             this.middlelogobase64 = res.data.middleInfo.logo;
             this.middlebackgroupbase64 = res.data.middleInfo.ui_back_ground;
@@ -1018,9 +1092,18 @@ export default {
           internationalInfo: this.productMiddleSetform.internationalInfo,
           logo: this.middlelogobase64,
           uiSize: this.productMiddleSetform.uiSize,
-          uiBackgroup: this.middlebackgroupbase64,
+          uiBackGround: this.middlebackgroupbase64,
           download: this.productMiddleSetform.download,
+          websiteUrl: this.productMiddleSetform.websiteUrl,
         };
+        if (!data.logo) {
+          this.$message.error("请上传产品LOGO");
+          return;
+        }
+        if (!data.download) {
+          this.$message.error("请添加下载渠道");
+          return;
+        }
         this.request.post("/middle/saveMiddle", data).then((res) => {
           console.log(res);
           if (res.code === "200") {
@@ -1042,9 +1125,18 @@ export default {
           internationalInfo: this.productMiddleSetform.internationalInfo,
           logo: this.middlelogobase64,
           uiSize: this.productMiddleSetform.uiSize,
-          uiBackgroup: this.middlebackgroupbase64,
+          uiBackGround: this.middlebackgroupbase64,
           download: this.productMiddleSetform.download,
+          websiteUrl: this.productMiddleSetform.websiteUrl,
         };
+        if (!data.logo) {
+          this.$message.error("请上传产品LOGO");
+          return;
+        }
+        if (!data.download) {
+          this.$message.error("请添加下载渠道");
+          return;
+        }
         this.request.post("/middle/updateMiddle", data).then((res) => {
           console.log(res);
           if (res.code === "200") {
@@ -1062,6 +1154,15 @@ export default {
       this.middlelogobase64 = await this.fileToBase64(file.raw).then((res) => {
         return res;
       });
+    },
+    // 替换图片按钮点击事件
+    handleReplaceClick() {
+      // 清空当前上传的文件
+      this.logoList = []; // 清空之前的文件列表
+    },
+    handleReplaceClick2() {
+      // 清空当前上传的文件
+      this.bgList = []; // 清空之前的文件列表
     },
     handleuploadLogoRemove(file, fileList) {
       this.middlelogobase64 = "";
