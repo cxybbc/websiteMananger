@@ -6,6 +6,8 @@
       :visible.sync="isProductCategory"
       width="50%"
       height="400px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <div class="content">
         <!-- 表单内容 -->
@@ -65,6 +67,8 @@
 
     <!-- 分类名称 国际化 -->
     <el-dialog
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       :title="productTitle"
       :visible.sync="isProductCateEditDialog"
       width="50%"
@@ -117,6 +121,8 @@
 
     <!-- 下载渠道编辑弹窗 -->
     <el-dialog
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       title="编辑下载渠道"
       :visible.sync="isProductMiddleDowndialog"
       width="50%"
@@ -176,6 +182,8 @@
 
     <!-- 产品中台 新增编辑 -->
     <el-dialog
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       title="新增/编辑产品"
       :visible.sync="productappcenter"
       width="50%"
@@ -203,7 +211,7 @@
           >
             <el-input
               :disabled="true"
-              style="width: 500px"
+              style="width: 40vh"
               v-model="productMiddleSetform.internationalName"
             />
             <el-button type="primary" @click="handleEdit('productNameEdit')"
@@ -220,7 +228,7 @@
           <el-form-item label="简介国际化" prop="internationalInfo">
             <el-input
               :disabled="true"
-              style="width: 500px"
+              style="width: 40vh"
               v-model="productMiddleSetform.internationalInfo"
             />
             <el-button type="primary" @click="handleEdit('productDetailEdit')"
@@ -266,7 +274,7 @@
           <el-form-item label="下载渠道" prop="download">
             <el-input
               :disabled="true"
-              style="width: 500px"
+              style="width: 40vh"
               v-model="productMiddleSetform.download"
             />
             <el-button type="primary" @click="handleDownloadEdit()"
@@ -282,7 +290,7 @@
           <el-form-item label="官网链接">
             <el-input
               :disabled="true"
-              style="width: 500px"
+              style="width: 40vh"
               v-model="productMiddleSetform.websiteUrl"
             ></el-input>
             <el-button type="primary" @click="handleEdit('productWebsiteEdit')"
@@ -333,11 +341,13 @@
 
     <!-- 推荐产品分类 -->
     <el-dialog
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       title="推荐产品分类"
       :visible.sync="isproductPreview"
       width="80%"
     >
-      <div class="preview_content" style="height: 500px">
+      <div class="preview_content" style="height: 500px; overflow-y: auto">
         <div v-if="assortList.length === 0" class="empty-message">
           <p style="text-align: center">没有数据可显示</p>
         </div>
@@ -398,6 +408,8 @@
     <!-- 推荐产品分类产品中台 -->
 
     <el-dialog
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       title="推荐产品分类"
       :visible.sync="isproductPreviewcenter"
       width="80%"
@@ -409,6 +421,7 @@
           stripe
           :header-cell-class-name="'headerBg'"
           style="width: 100%"
+          maxHeight="500px"
           :data="rationList"
           :selection.sync="selectedRows"
           @selection-change="handleSelectionChange"
@@ -584,7 +597,13 @@
         />
       </div>
       <div class="contentbox">
-        <el-table :data="tableDatas" :key="2" stripe style="width: 100%">
+        <el-table
+          :data="tableDatas"
+          :row-style="{ height: '35px' }"
+          :key="2"
+          stripe
+          style="width: 100%"
+        >
           <el-table-column
             prop="sortIndex"
             label="序号"
@@ -606,7 +625,11 @@
               />
             </template>
           </el-table-column>
-          <el-table-column prop="download" label="下载渠道"></el-table-column>
+          <el-table-column
+            prop="download"
+            :style="{ height: '60px', overflow: 'hidden' }"
+            label="下载渠道"
+          ></el-table-column>
           <el-table-column prop="actions" label="操作" width="280">
             <template v-slot="scope">
               <el-button
@@ -1068,6 +1091,8 @@ export default {
         this.middleID = row.id;
         this.request.post("/middle/middleInfo", { id: row.id }).then((res) => {
           if (res.code === "200") {
+            console.log(res);
+
             this.productMiddleSetform = {
               name: res.data.middleInfo.name,
               internationalName: res.data.middleInfo.international_name,
@@ -1215,7 +1240,21 @@ export default {
         if (res.code === "200") {
           this.$message.success("分配成功");
           this.isproductPreviewcenter = false;
-          this.isproductPreview = false;
+
+          const params = {
+            productId: this.middleID,
+          };
+          this.request.get("/middle/assortMiddle", { params }).then((res) => {
+            console.log(res);
+            if (res.code === "200") {
+              this.assortList = res.data.assortList.map((item) => ({
+                ...item,
+                selected: false,
+              }));
+            } else {
+              this.assortList = [];
+            }
+          });
         } else {
           this.$message.error("分配失败");
         }
@@ -1231,23 +1270,40 @@ export default {
       });
     },
     previewcenterdelete() {
-      const selectedItems = this.assortList.filter((item) => item.selected);
-      const selectedIds = selectedItems.map((item) => item.id);
-      console.log("选中的 id:", selectedIds);
+      const unselectedItems = this.assortList.filter((item) => !item.selected);
+      const unselectedIds = unselectedItems.map((item) => item.id);
+      console.log("未选中的 id:", unselectedIds);
       const data = {
-        ids: selectedIds,
+        ids: unselectedIds,
+        productIds: [this.middleID],
       };
-      this.request.post("/middle/deleteMiddle", data).then((res) => {
-        console.log(res);
 
+      this.request.post("/middle/rationMiddle", data).then((res) => {
+        console.log(res);
         if (res.code === "200") {
-          this.$message.success("删除成功");
-          this.isproductPreviewcenter = false;
-          this.isproductPreview = false;
+          this.$message.success("移除成功");
+
+          const params = {
+            productId: this.middleID,
+          };
+          this.request.get("/middle/assortMiddle", { params }).then((res) => {
+            console.log(res);
+            if (res.code === "200") {
+              this.assortList = res.data.assortList.map((item) => ({
+                ...item,
+                selected: false,
+              }));
+            } else {
+              this.assortList = [];
+            }
+          });
         } else {
-          this.$message.error("删除失败");
+          this.$message.error("移除失败");
         }
       });
+    },
+    rowClassName({ row, rowIndex }) {
+      return "fixed-row-height"; // 为每行添加类名
     },
 
     //初始获取产品列表
@@ -1369,7 +1425,26 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+:deep(.cell) {
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* 避免换行 */
+  line-height: 60px; /* 设置行高 */
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 60px !important; /* 确保行高固定 */
+}
+
+.fixed-row-height {
+  height: 60px !important;
+  line-height: 60px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* 控制 el-form-item 的布局 */
 .productapp_content .el-form-item {
   display: flex; /* 使用 flexbox 来实现内联布局 */
@@ -1388,6 +1463,7 @@ export default {
 }
 .el-form-item__content {
   display: flex;
+  margin-left: 0 !important;
 }
 
 .header {
