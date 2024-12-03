@@ -1,14 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router, {resetRouter} from "@/router";
+import router, { resetRouter } from "@/router";
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        currentPathName: ''
+        currentPathName: '',
+        recruitmentTypeList: [],//职位分类列表
+        webSiteList: [],//网站列表
     },
     mutations: {
-        setPath (state) {
+        setPath(state) {
             state.currentPathName = localStorage.getItem("currentPathName")
         },
         logout() {
@@ -19,6 +21,12 @@ const store = new Vuex.Store({
 
             // 重置路由
             resetRouter()
+        },
+        setRecruitmentTypeList(state, list) {
+            state.recruitmentTypeList = list
+        },
+        setWebSiteList(state, list) {
+            state.webSiteList = list
         }
     }
 })
