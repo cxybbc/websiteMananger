@@ -24,7 +24,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-pagination class="pagination" background layout="prev, pager, next" :page-size="20" :current-page="currentpage1" :total="total1" />
+                <el-pagination class="pagination" @current-change="typePaginaitonChange" background layout="prev, pager, next" :page-size="pageSize1" :current-page="currentpage1" :total="total1" />
             </main>
         </div>
         <div class="positionlist">
@@ -58,7 +58,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-pagination class="pagination" background layout="prev, pager, next" :page-size="20" :current-page="currentpage2" :total="total2" />
+                <el-pagination class="pagination" @current-change="positionPaginaitonChange" background layout="prev, pager, next" :page-size="pageSize2" :current-page="currentpage2" :total="total2" />
             </main>
         </div>
     </div>
@@ -78,9 +78,11 @@ export default defineComponent({
         return {
             TypeTableData: [],
             positionData: [],
-            total1: 1000,
+            total1: 0,
             currentpage1: 1,
-            total2: 1000,
+            pageSize1: 6,
+            pageSize2: 5,
+            total2: 0,
             currentpage2: 1,
             isShowEditor: false,
             isShowPositionEditor: false,
@@ -104,6 +106,36 @@ export default defineComponent({
     watch: {},
 
     methods: {
+        //职位分类
+        positionPaginaitonChange(page) {
+            this.currentpage2 = page
+            console.log('页码', page)
+
+            this.getPositionList()
+        },
+
+        //职位分类分页
+        async typePaginaitonChange(page) {
+            try {
+                this.currentpage1 = page
+                if (this.searchInput) {
+                    this.isTypeloading = true
+                    const res = await request.post('/recruit/searchCategory', {
+                        pageNum: this.currentpage1,
+                        pageSize: this.pageSize1,
+                        name: this.searchInput
+                    })
+                    console.log('搜索结果', res)
+                    this.isTypeloading = false
+                    this.total1 = res.data.searchData.total
+                    this.TypeTableData = res.data.searchData.records
+                } else {
+                    this.getRecruitmentTypeList()
+                }
+            } catch (err) {
+                console.log('分页失败')
+            }
+        },
         //获取分类列表
         async getRecruitmentTypeList() {
             try {
@@ -111,7 +143,7 @@ export default defineComponent({
                 const res = await request.get('/recruit/categoryPageList', {
                     params: {
                         pageNum: this.currentpage1,
-                        pageSize: 20
+                        pageSize: this.pageSize1
                     }
                 })
                 this.isTypeloading = false
@@ -129,8 +161,12 @@ export default defineComponent({
                 const res = await request.get('/info/recruitInfoPageList', {
                     params: {
                         pageNum: this.currentpage2,
-                        pageSize: 20
+                        pageSize: this.pageSize2
                     }
+                })
+                console.log('参数', {
+                    pageNum: this.currentpage2,
+                    pageSize: this.pageSize2
                 })
                 this.isPosistonloading = false
                 console.log('获取职位列表', res)
@@ -159,12 +195,12 @@ export default defineComponent({
                         this.isTypeloading = true
                         const res = await request.post('/recruit/searchCategory', {
                             pageNum: this.currentpage1,
-                            pageSize: 20,
+                            pageSize: this.pageSize1,
                             name: this.searchInput
                         })
                         console.log('搜索结果', res)
                         this.isTypeloading = false
-                        this.total = res.data.searchData.total
+                        this.total1 = res.data.searchData.total
                         this.TypeTableData = res.data.searchData.records
                     }
                 } catch (err) {
@@ -182,11 +218,11 @@ export default defineComponent({
                         this.isTypeloading = true
                         const res = await request.post('/recruit/searchCategory', {
                             pageNum: this.currentpage2,
-                            pageSize: 20,
+                            pageSize: this.pageSize2,
                             name: this.searchInput
                         })
                         this.isTypeloading = false
-                        this.total = res.data.searchData.total
+                        this.total2 = res.data.searchData.total2
                         this.TypeTableData = res.data.searchData.records
                         console.log('搜索结果', res)
                     }
@@ -248,12 +284,29 @@ export default defineComponent({
             this.pid = row.pid
             this.isShowEditor = true
         },
-        hiddialog() {
+        async hiddialog() {
             this.isShowEditor = false
             this.pid = -1
             this.typeInfo = null
             this.sortIndex = 0
-            this.getRecruitmentTypeList()
+            if (this.searchInput) {
+                this.isTypeloading = true
+                try {
+                    const res = await request.post('/recruit/searchCategory', {
+                        pageNum: this.currentpage2,
+                        pageSize: this.pageSize2,
+                        name: this.searchInput
+                    })
+                    this.isTypeloading = false
+                    this.total2 = res.data.searchData.total2
+                    this.TypeTableData = res.data.searchData.records
+                    console.log('搜索结果', res)
+                } catch (err) {
+                    console.log('失败', err)
+                }
+            } else {
+                this.getRecruitmentTypeList()
+            }
         },
         hidPositionDialog() {
             this.isShowPositionEditor = false
@@ -271,7 +324,7 @@ export default defineComponent({
         initeType(categoryId) {
             if (categoryId) {
                 const list = this.$store.state.recruitmentTypeList
-                return list.find(item => item.id === categoryId).name
+                return list.find(item => item.id === categoryId)?.name
             } else {
                 return '--'
             }
