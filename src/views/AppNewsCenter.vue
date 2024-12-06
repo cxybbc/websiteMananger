@@ -3,7 +3,24 @@
         <editorNew :isloading="detailLoading" :isShow="isShowEditorBox" :newDetailInfo="newDetailInfo" @refresh="hideDialog" />
         <h1>新闻中心</h1>
         <header>
-            <div></div>
+            <div class="selectBox">
+                <div class="selectBox_item">
+                    <p>应用站点：</p>
+                    <el-select v-model="serachWebId" placeholder="请选择">
+                        <el-option v-for="item in webList" :key="item.id" :label="item.webSiteName" :value="item.id" />
+                    </el-select>
+                </div>
+                <div class="selectBox_item">
+                    <p>新闻标题：</p>
+                    <el-input v-model="serachTitle" placeholder="请输入新闻标题" />
+                </div>
+                <div class="searchbtn">
+                    <el-button type="primary" @click="seraching">搜索</el-button>
+                </div>
+                <div class="searchbtn">
+                    <el-button @click="reset">重置</el-button>
+                </div>
+            </div>
             <el-button type="primary" @click="addNew">新增新闻</el-button>
         </header>
         <main>
@@ -58,18 +75,55 @@ export default defineComponent({
             isShowEditorBox: false,
             newDetailInfo: null,
             pageSize: 20,
-            detailLoading: false
+            detailLoading: false,
+            serachWebId: null,
+            serachTitle: ''
         }
     },
 
-    computed: {},
+    computed: {
+        webList() {
+            return this.$store.state.webSiteList
+        }
+    },
 
     watch: {},
 
     methods: {
+        reset() {
+            this.getNewsList()
+        },
+        seraching() {
+            this.serachNews()
+        },
         PaginaitonChange(page) {
             this.currentpage1 = page
-            this.getNewsList()
+
+            if (this.serachWebId || this.serachTitle) {
+                this.serachNews()
+            } else {
+                this.getNewsList()
+            }
+        },
+
+        async serachNews() {
+            try {
+                this.isNewsLoading = true
+                const res = await request.get('/news/searchNewsManage', {
+                    params: {
+                        pageNum: this.currentpage1,
+                        pageSize: this.pageSize,
+                        appWebsiteId: this.serachWebId,
+                        likeStr: this.serachTitle
+                    }
+                })
+                console.log('搜索新闻', res)
+                if (res.code == 200) {
+                    this.tableData = res.data.newsList.records
+                    this.total1 = res.data.newsList.total
+                    this.isNewsLoading = false
+                }
+            } catch (err) {}
         },
         async getNewsList() {
             this.isNewsLoading = true
@@ -198,5 +252,19 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
+    .selectBox {
+        display: flex;
+        .selectBox_item {
+            &:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+        .searchbtn {
+            transform: translateY(15px);
+            &:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+    }
 }
 </style>
