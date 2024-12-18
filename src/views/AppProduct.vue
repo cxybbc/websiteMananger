@@ -357,6 +357,7 @@ export default {
             Localizationfrom: [
                 { language: '', content: '' } // 初始一行数据
             ],
+            //TODO 编辑下载地址
             downloadfrom: [
                 { downloadType: '', downloadUrl: '' } // 初始一行数据
             ],
@@ -745,6 +746,21 @@ export default {
                             download: res.data.middleInfo.download,
                             websiteUrl: res.data.middleInfo.website_url,
                             uiBackGroundMobile: res.data.middleInfo.ui_back_ground_mobile
+                        }
+                        //TODO 下载地址
+                        if (res.data.middleInfo.download) {
+                            console.log('下载地址----', JSON.parse(res.data.middleInfo.download))
+                            const downloadArr = JSON.parse(res.data.middleInfo.download)
+                            if (downloadArr.length) {
+                                this.downloadfrom = []
+                                downloadArr.forEach(item => {
+                                    this.downloadfrom.push({ downloadType: item.downloadType, downloadUrl: item.downloadUrl })
+                                })
+                            } else {
+                                this.downloadfrom = [{ downloadType: '', downloadUrl: '' }]
+                            }
+                        } else {
+                            this.downloadfrom = [{ downloadType: '', downloadUrl: '' }]
                         }
                         this.middlelogobase64 = res.data.middleInfo.logo
                         this.middlebackgroupbase64 = res.data.middleInfo.ui_back_ground
