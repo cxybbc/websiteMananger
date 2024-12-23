@@ -9,6 +9,7 @@
                     <span>分类名称:</span>
                     <el-input @input="searchType" v-model="searchInput" placeholder="请输入内容"></el-input>
                 </div>
+
                 <el-button type="primary" @click="addType">新增分类</el-button>
             </header>
             <main>

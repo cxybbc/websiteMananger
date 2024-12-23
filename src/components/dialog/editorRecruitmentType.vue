@@ -5,6 +5,11 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
+                <el-form-item label="站点" prop="appWebsiteId">
+                    <el-select v-model="form.appWebsiteId" placeholder="请选择">
+                        <el-option v-for="item in webList" :key="item.id" :label="item.webSiteName" :value="item.id"> </el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="canceldialog">取 消</el-button>
@@ -41,10 +46,12 @@ export default defineComponent({
                 name: '',
                 id: '',
                 pid: '',
-                sortIndex: ''
+                sortIndex: '',
+                appWebsiteId: ''
             },
             rules: {
-                name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+                name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
+                appWebsiteId: [{ required: true, message: '请选择站点', trigger: 'blur' }]
             }
         }
     },
@@ -61,6 +68,9 @@ export default defineComponent({
             } else {
                 return '修改分类'
             }
+        },
+        webList() {
+            return this.$store.state.webSiteList
         }
     },
 
@@ -74,6 +84,8 @@ export default defineComponent({
                     this.form.sortIndex = this.typeInfo?.sortIndex
                     this.typeId = this.typeInfo?.id
                     console.log(this.typeInfo)
+
+                    console.log('webSiteList', this.$store.state.webSiteList)
                 } else {
                     for (let key in this.form) {
                         this.form[key] = ''
@@ -102,7 +114,8 @@ export default defineComponent({
                     const res = await request.post('/recruit/saveCategory', {
                         name: this.form.name,
                         pid: this.pid === -1 ? 0 : this.pid + 1,
-                        sortIndex: 1
+                        sortIndex: 1,
+                        appWebsiteId: this.form.appWebsiteId
                     })
                     console.log('新增', res)
                 } else {

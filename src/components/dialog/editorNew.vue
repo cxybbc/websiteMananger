@@ -3,7 +3,7 @@
         <el-dialog title="新闻编辑" :visible.sync="dialogVisible" width="50%" :before-close="closeDialog" :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="应用站点">
-                    <el-select v-model="form.appWebsiteId" filterable placeholder="请选择">
+                    <el-select v-model="form.appWebsiteIds" multiple filterable placeholder="请选择">
                         <el-option v-for="item in websiteList" :key="item.id" :label="item.webSiteName" :value="item.id"> </el-option>
                     </el-select>
                 </el-form-item>
@@ -53,7 +53,7 @@ export default defineComponent({
         return {
             form: {
                 id: '', //新闻id
-                appWebsiteId: '', //应用站点
+                appWebsiteIds: [], //应用站点
                 title: '', //标题
                 text: '', //新闻内容
                 cover: '', //封面图
@@ -84,10 +84,18 @@ export default defineComponent({
         newDetailInfo: {
             handler(val) {
                 if (val.id) {
-                    this.form = this.newDetailInfo
+                    const copyData = JSON.parse(JSON.stringify(val))
+                    for (let key in this.form) {
+                        if (key === 'appWebsiteIds') {
+                            this.form[key] = [copyData.appWebsiteId]
+                        } else {
+                            this.form[key] = copyData[key]
+                        }
+                    }
                 } else {
                     for (let key in this.form) {
                         this.form[key] = ''
+                        this.form.appWebsiteIds = []
                     }
                 }
             },
