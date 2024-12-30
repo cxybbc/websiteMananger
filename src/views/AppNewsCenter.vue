@@ -38,13 +38,23 @@
                 <el-table-column label="网站">
                     <template #default="scope"> {{ initWebsiteName(scope.row.appWebsiteId) }} </template>
                 </el-table-column>
-
+                <el-table-column label="已应用网站">
+                    <template #default="scope">
+                        <ul v-for="item in scope.row.appWebsiteIdList" :key="item.appWebsiteId">
+                            {{
+                                item.appWebsiteName
+                            }}
+                        </ul>
+                    </template>
+                </el-table-column>
                 <el-table-column label="封面图">
                     <template #default="scope">
                         <img :src="scope.row.cover" style="object-fit: contain; height: 100px" alt="" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="创建时间" />
+                <el-table-column prop="createTime" label="创建时间">
+                    <template #default="scope"> {{ initeCreateDate(scope.row.createTime) }} </template>
+                </el-table-column>
                 <el-table-column prop="action" label="操作">
                     <template #default="scope">
                         <el-button size="small" @click="handleEdit(scope.row)"> 修改 </el-button>
@@ -61,6 +71,7 @@
 import { defineComponent } from 'vue'
 import request from '@/utils/request'
 import editorNew from '@/components/dialog/editorNew.vue'
+import dayjs from 'dayjs'
 export default defineComponent({
     name: 'NewsCenter',
 
@@ -104,6 +115,9 @@ export default defineComponent({
             } else {
                 this.getNewsList()
             }
+        },
+        initeCreateDate(time) {
+            return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
         },
 
         async serachNews() {
@@ -156,7 +170,12 @@ export default defineComponent({
         hideDialog() {
             this.isShowEditorBox = false
             this.newDetailInfo = {}
-            this.getNewsList()
+
+            if (this.serachWebId || this.serachTitle) {
+                this.serachNews()
+            } else {
+                this.getNewsList()
+            }
         },
         initWebsiteName(websiteId) {
             return this.$store.state.webSiteList.find(item => item.id === websiteId)?.webSiteName
@@ -188,7 +207,11 @@ export default defineComponent({
                         console.log('delete', res)
                         if (res.code == 200) {
                             this.$message.success(res.msg)
-                            this.getNewsList()
+                            if (this.serachWebId || this.serachTitle) {
+                                this.serachNews()
+                            } else {
+                                this.getNewsList()
+                            }
                         } else {
                             this.$message.error(res.msg)
                         }

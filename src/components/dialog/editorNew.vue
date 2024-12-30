@@ -1,12 +1,17 @@
 <template>
     <div v-loading="isloading">
         <el-dialog title="新闻编辑" :visible.sync="dialogVisible" width="50%" :before-close="closeDialog" :close-on-click-modal="false">
-            <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="应用站点">
+            <el-form ref="form" :model="form" label-width="100px">
+                <el-form-item label="已绑定其他应用站点">
                     <el-select v-model="form.appWebsiteIds" multiple filterable placeholder="请选择">
-                        <el-option v-for="item in websiteList" :key="item.id" :label="item.webSiteName" :value="item.id"> </el-option>
+                        <el-option v-for="item in websiteList" :key="item.id" :label="item.webSiteName" :value="item.id" :disabled="disabledOption(item)"> </el-option>
                     </el-select>
                 </el-form-item>
+                <!-- <el-form-item label="已应用站点">
+                    <el-select v-model="form.oldAppWebsiteIds" multiple disabled filterable>
+                        <el-option v-for="item in websiteList" :key="item.id" :label="item.webSiteName" :value="item.id"> </el-option>
+                    </el-select>
+                </el-form-item> -->
                 <el-form-item label="新闻标题">
                     <el-input v-model="form.title" placeholder="请输入新闻标题"></el-input>
                 </el-form-item>
@@ -20,6 +25,10 @@
                     <el-upload class="upload-demo" :http-request="uploadCover" action="" :on-remove="removeFile" :on-change="beforeUpload" accept=".jpeg,.png,.jpg,.bmp,.gif" :file-list="fileList">
                         <el-button size="small" type="primary">点击上传</el-button>
                     </el-upload>
+                    <div v-if="this.form.cover">
+                        <p style="color: aqua; font-size: 12px">已上传图片</p>
+                        <img style="width: 100px; height: auto" :src="this.form.cover" alt="" />
+                    </div>
                 </el-form-item>
 
                 <el-form-item label="新闻内容">
@@ -54,11 +63,13 @@ export default defineComponent({
             form: {
                 id: '', //新闻id
                 appWebsiteIds: [], //应用站点
+                oldAppWebsiteIds: [], //应用站点
                 title: '', //标题
                 text: '', //新闻内容
                 cover: '', //封面图
                 isTop: '' //是否指定置顶
             },
+            currentId: '',
             fileList: [],
             editorRef: null,
             toolbarConfig: {
@@ -83,11 +94,24 @@ export default defineComponent({
     watch: {
         newDetailInfo: {
             handler(val) {
+                this.fileList = []
                 if (val.id) {
                     const copyData = JSON.parse(JSON.stringify(val))
+                    console.log('copyData', copyData)
                     for (let key in this.form) {
                         if (key === 'appWebsiteIds') {
-                            this.form[key] = [copyData.appWebsiteId]
+                            this.currentId = copyData.appWebsiteId
+                            if (copyData.appWebsiteIdList.length) {
+                                copyData.appWebsiteIdList.forEach(element => {
+                                    this.form['appWebsiteIds'].push(element.appWebsiteId)
+                                })
+                            }
+                        } else if (key === 'oldAppWebsiteIds') {
+                            if (copyData.appWebsiteIdList.length) {
+                                copyData.appWebsiteIdList.forEach(element => {
+                                    this.form['oldAppWebsiteIds'].push(element.appWebsiteId)
+                                })
+                            }
                         } else {
                             this.form[key] = copyData[key]
                         }
@@ -96,6 +120,7 @@ export default defineComponent({
                     for (let key in this.form) {
                         this.form[key] = ''
                         this.form.appWebsiteIds = []
+                        this.form.oldAppWebsiteIds = []
                     }
                 }
             },
@@ -104,6 +129,13 @@ export default defineComponent({
     },
 
     methods: {
+        disabledOption(item) {
+            if (item.id == this.currentId) {
+                return true
+            } else {
+                return false
+            }
+        },
         closeDialog() {
             this.$emit('refresh')
         },
@@ -216,4 +248,7 @@ export default defineComponent({
 
 <style lang="less" scoped>
 @import '@wangeditor/editor/dist/css/style.css';
+.disabledOption {
+    // :deep() ;
+}
 </style>
