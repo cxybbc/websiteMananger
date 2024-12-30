@@ -551,6 +551,8 @@
 
       <div style="padding: 10px 0">
         <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
           :page-sizes="[5, 10, 15, 20, 25]"
           :page-size="pageSize"
           :current-page="pageNum"
@@ -652,6 +654,8 @@
           :page-sizes="[5, 10, 15, 20, 25]"
           :page-size="centerpageSize"
           :current-page="centerpageNum"
+          @size-change="handleCenterSizeChange"
+          @current-change="handleCenterCurrentChange"
           layout="total, sizes, prev, pager, next, jumper"
           :total="totals"
         >
@@ -812,12 +816,18 @@ export default {
           international: this.productSetform.localization,
         };
         console.log("产品新增请求参数：", data);
+
         this.request.post("/product/saveProduct", data).then((res) => {
           console.log(res);
           if (res.code === "200") {
             this.$message.success("新增产品分类成功");
             this.isProductCategory = false;
             this.getProductList();
+            if (this.WEB_ID) {
+              console.log("当前有搜索条件，重新搜索", this.WEB_ID);
+              this.searchProductCategory();
+              return;
+            }
           } else {
             this.$message.error("新增产品分类失败");
           }
@@ -859,6 +869,11 @@ export default {
               if (res.code === "200") {
                 this.$message.success("删除产品分类成功");
                 this.getProductList();
+                if (this.WEB_ID) {
+                  console.log("当前有搜索条件，重新搜索", this.WEB_ID);
+                  this.searchProductCategory();
+                  return;
+                }
               } else {
                 this.$message.error("删除产品分类失败");
               }
@@ -1091,7 +1106,7 @@ export default {
         this.middleID = row.id;
         this.request.post("/middle/middleInfo", { id: row.id }).then((res) => {
           if (res.code === "200") {
-            console.log(res);
+            console.log("????????????????????", res);
 
             this.productMiddleSetform = {
               name: res.data.middleInfo.name,
@@ -1102,6 +1117,7 @@ export default {
               download: res.data.middleInfo.download,
               websiteUrl: res.data.middleInfo.website_url,
             };
+            this.bgList = [];
             this.middlelogobase64 = res.data.middleInfo.logo;
             this.middlebackgroupbase64 = res.data.middleInfo.ui_back_ground;
           }
@@ -1270,15 +1286,15 @@ export default {
       });
     },
     previewcenterdelete() {
-      const unselectedItems = this.assortList.filter((item) => !item.selected);
+      const unselectedItems = this.assortList.filter((item) => item.selected);
       const unselectedIds = unselectedItems.map((item) => item.id);
-      console.log("未选中的 id:", unselectedIds);
+      console.log("选中的 id:", unselectedIds);
       const data = {
         ids: unselectedIds,
         productIds: [this.middleID],
       };
 
-      this.request.post("/middle/rationMiddle", data).then((res) => {
+      this.request.post("/middle/relieveMiddle", data).then((res) => {
         console.log(res);
         if (res.code === "200") {
           this.$message.success("移除成功");
@@ -1324,7 +1340,7 @@ export default {
           if (productRes.code === "200") {
             console.log("接口原始数据：", productRes.data.productList);
             this.pageSize = productRes.data.productList.size;
-            this.pageNum = productRes.data.productList.pages;
+            this.pageNum = this.pageNum;
             this.total = productRes.data.productList.total;
             this.tableData = productRes.data.productList.records;
           } else {
@@ -1333,7 +1349,7 @@ export default {
 
           // 检查 appRes 的返回数据
           if (appRes.code === "200") {
-            console.log("官网数据列表：", appRes.data.appList);
+            console.log("官网数据列表：", appRes.data);
             this.appList = appRes.data.appList;
           } else {
             console.error("官网接口错误，code：", appRes.data.code);
@@ -1354,7 +1370,7 @@ export default {
         if (res.code === "200") {
           this.tableDatas = res.data.middleList.records;
           this.centerpageSize = res.data.middleList.size;
-          this.centerpageNum = res.data.middleList.pages;
+          this.centerpageNum = this.centerpageNum;
           this.totals = res.data.middleList.total;
         } else {
         }
@@ -1403,6 +1419,29 @@ export default {
           reject(new Error("Failed to load file"));
         };
       });
+    },
+
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getProductList();
+      console.log("???", val);
+    },
+    handleCurrentChange(val) {
+      this.pageNum = val;
+      console.log("当前页码：", val);
+
+      this.getProductList();
+    },
+    handleCenterSizeChange(val) {
+      this.centerpageSize = val;
+      this.getProductCenter();
+      console.log("???", val);
+    },
+    handleCenterCurrentChange(val) {
+      this.centerpageNum = val;
+      console.log("当前页码：", val);
+
+      this.getProductCenter();
     },
   },
   watch: {
