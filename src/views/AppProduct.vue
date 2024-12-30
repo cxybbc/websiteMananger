@@ -189,7 +189,7 @@
       width="50%"
       height="400px"
     >
-      <div class="productapp_content" style="height: 500px">
+      <div class="productapp_content" style="min-height: 500px">
         <el-form
           ref="productForm"
           :model="productMiddleSetform"
@@ -327,6 +327,37 @@
                 size="small"
                 type="danger"
                 @click="handleReplaceClick2"
+                >替换图片</el-button
+              >
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="移动端UI背景图">
+            <el-input
+              v-if="middleMbackgroupbase64"
+              v-model="middleMbackgroupbase64"
+              width="300px"
+            />
+            <el-upload
+              ref="upload2"
+              :show-file-list="false"
+              action="action"
+              :on-change="handleuploadMBg"
+              :on-remove="handleuploadMBgRemove"
+              :limit="1"
+              :auto-upload="false"
+            >
+              <el-button
+                slot="trigger"
+                v-if="!middleMbackgroupbase64"
+                size="small"
+                type="primary"
+                >+ 添加图片</el-button
+              >
+              <el-button
+                slot="trigger"
+                v-if="middleMbackgroupbase64"
+                size="small"
+                type="danger"
                 >替换图片</el-button
               >
             </el-upload>
@@ -551,8 +582,7 @@
 
       <div style="padding: 10px 0">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @current-change="handleChangePage"
           :page-sizes="[5, 10, 15, 20, 25]"
           :page-size="pageSize"
           :current-page="pageNum"
@@ -627,6 +657,26 @@
               />
             </template>
           </el-table-column>
+          <el-table-column label="web端UI背景">
+            <template v-slot="scope">
+              <img
+                :src="'//' + scope.row.uiBackGround"
+                alt="产品LOGO"
+                style="width: 38px; height: 38px; border-radius: 5px"
+                v-if="scope.row.uiBackGround"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="移动端UI背景">
+            <template v-slot="scope">
+              <img
+                :src="'//' + scope.row.uiBackGroundMobile"
+                alt="产品LOGO"
+                style="width: 38px; height: 38px; border-radius: 5px"
+                v-if="scope.row.uiBackGroundMobile"
+              />
+            </template>
+          </el-table-column>
           <el-table-column
             prop="download"
             :style="{ height: '60px', overflow: 'hidden' }"
@@ -651,11 +701,10 @@
 
       <div style="padding: 10px 0">
         <el-pagination
+          @current-change="handleChangePageCentet"
           :page-sizes="[5, 10, 15, 20, 25]"
           :page-size="centerpageSize"
           :current-page="centerpageNum"
-          @size-change="handleCenterSizeChange"
-          @current-change="handleCenterCurrentChange"
           layout="total, sizes, prev, pager, next, jumper"
           :total="totals"
         >
@@ -704,6 +753,7 @@ export default {
       },
       middlelogobase64: "",
       middlebackgroupbase64: "",
+      middleMbackgroupbase64: "",
       productSetformRules: {
         website: [
           { required: true, message: "请选择所属官网", trigger: "blur" },
@@ -721,6 +771,7 @@ export default {
       Localizationfrom: [
         { language: "", content: "" }, // 初始一行数据
       ],
+      //TODO 编辑下载地址
       downloadfrom: [
         { downloadType: "", downloadUrl: "" }, // 初始一行数据
       ],
@@ -740,6 +791,23 @@ export default {
     };
   },
   methods: {
+    handleChangePage(page) {
+      this.pageNum = page;
+      if (this.WEB_ID) {
+        this.searchProductCategory();
+      } else {
+        this.getProductList();
+      }
+    },
+    handleChangePageCentet(page) {
+      this.centerpageNum = page;
+      if (this.middleAppTitle) {
+        this.searchProductCategory();
+      } else {
+        this.getProductList();
+      }
+    },
+
     //搜索官网产品数据
     searchProductCategory() {
       console.log("??????", this.WEB_ID);
@@ -757,8 +825,8 @@ export default {
           } else {
             this.tableData = res.data.searchData.records;
             this.total = res.data.searchData.total;
-            this.pageNum = res.data.searchData.pages; //当前页码
-            this.pageSize = res.data.searchData.size; //每页显示条数
+            // this.pageNum = res.data.searchData.pages //当前页码
+            // this.pageSize = res.data.searchData.size //每页显示条数
           }
         }
       });
@@ -816,18 +884,12 @@ export default {
           international: this.productSetform.localization,
         };
         console.log("产品新增请求参数：", data);
-
         this.request.post("/product/saveProduct", data).then((res) => {
           console.log(res);
           if (res.code === "200") {
             this.$message.success("新增产品分类成功");
             this.isProductCategory = false;
             this.getProductList();
-            if (this.WEB_ID) {
-              console.log("当前有搜索条件，重新搜索", this.WEB_ID);
-              this.searchProductCategory();
-              return;
-            }
           } else {
             this.$message.error("新增产品分类失败");
           }
@@ -869,11 +931,6 @@ export default {
               if (res.code === "200") {
                 this.$message.success("删除产品分类成功");
                 this.getProductList();
-                if (this.WEB_ID) {
-                  console.log("当前有搜索条件，重新搜索", this.WEB_ID);
-                  this.searchProductCategory();
-                  return;
-                }
               } else {
                 this.$message.error("删除产品分类失败");
               }
@@ -1092,11 +1149,13 @@ export default {
           uiBackGround: "",
           download: "",
           websiteUrl: "",
+          uiBackGroundMobile: "",
         };
         this.downloadfrom = [
           { downloadType: "", downloadUrl: "" }, // 初始一行数据
         ];
         this.middlebackgroupbase64 = "";
+        this.middleMbackgroupbase64 = "";
         this.middlelogobase64 = "";
         this.bgList = [];
         this.logoList = [];
@@ -1106,7 +1165,7 @@ export default {
         this.middleID = row.id;
         this.request.post("/middle/middleInfo", { id: row.id }).then((res) => {
           if (res.code === "200") {
-            console.log("????????????????????", res);
+            console.log(res);
 
             this.productMiddleSetform = {
               name: res.data.middleInfo.name,
@@ -1116,10 +1175,33 @@ export default {
               uiSize: res.data.middleInfo.ui_size,
               download: res.data.middleInfo.download,
               websiteUrl: res.data.middleInfo.website_url,
+              uiBackGroundMobile: res.data.middleInfo.ui_back_ground_mobile,
             };
-            this.bgList = [];
+            //TODO 下载地址
+            if (res.data.middleInfo.download) {
+              console.log(
+                "下载地址----",
+                JSON.parse(res.data.middleInfo.download)
+              );
+              const downloadArr = JSON.parse(res.data.middleInfo.download);
+              if (downloadArr.length) {
+                this.downloadfrom = [];
+                downloadArr.forEach((item) => {
+                  this.downloadfrom.push({
+                    downloadType: item.downloadType,
+                    downloadUrl: item.downloadUrl,
+                  });
+                });
+              } else {
+                this.downloadfrom = [{ downloadType: "", downloadUrl: "" }];
+              }
+            } else {
+              this.downloadfrom = [{ downloadType: "", downloadUrl: "" }];
+            }
             this.middlelogobase64 = res.data.middleInfo.logo;
             this.middlebackgroupbase64 = res.data.middleInfo.ui_back_ground;
+            this.middleMbackgroupbase64 =
+              res.data.middleInfo.ui_back_ground_mobile;
           }
         });
       }
@@ -1134,6 +1216,7 @@ export default {
           logo: this.middlelogobase64,
           uiSize: this.productMiddleSetform.uiSize,
           uiBackGround: this.middlebackgroupbase64,
+          uiBackGroundMobile: this.middleMbackgroupbase64,
           download: this.productMiddleSetform.download,
           websiteUrl: this.productMiddleSetform.websiteUrl,
         };
@@ -1167,6 +1250,7 @@ export default {
           logo: this.middlelogobase64,
           uiSize: this.productMiddleSetform.uiSize,
           uiBackGround: this.middlebackgroupbase64,
+          uiBackGroundMobile: this.middleMbackgroupbase64,
           download: this.productMiddleSetform.download,
           websiteUrl: this.productMiddleSetform.websiteUrl,
         };
@@ -1215,10 +1299,19 @@ export default {
         }
       );
     },
+    async handleuploadMBg(file) {
+      this.middleMbackgroupbase64 = await this.fileToBase64(file.raw).then(
+        (res) => {
+          return res;
+        }
+      );
+    },
     handleuploadBgRemove() {
       this.middlebackgroupbase64 = "";
     },
-
+    handleuploadMBgRemove() {
+      this.middleMbackgroupbase64 = "";
+    },
     //产品分类 进入产品中台
     handlePreviewcenter() {
       this.isproductPreviewcenter = true;
@@ -1286,15 +1379,15 @@ export default {
       });
     },
     previewcenterdelete() {
-      const unselectedItems = this.assortList.filter((item) => item.selected);
+      const unselectedItems = this.assortList.filter((item) => !item.selected);
       const unselectedIds = unselectedItems.map((item) => item.id);
-      console.log("选中的 id:", unselectedIds);
+      console.log("未选中的 id:", unselectedIds);
       const data = {
         ids: unselectedIds,
         productIds: [this.middleID],
       };
 
-      this.request.post("/middle/relieveMiddle", data).then((res) => {
+      this.request.post("/middle/rationMiddle", data).then((res) => {
         console.log(res);
         if (res.code === "200") {
           this.$message.success("移除成功");
@@ -1339,8 +1432,8 @@ export default {
 
           if (productRes.code === "200") {
             console.log("接口原始数据：", productRes.data.productList);
-            this.pageSize = productRes.data.productList.size;
-            this.pageNum = this.pageNum;
+            // this.pageSize = productRes.data.productList.size
+            // this.pageNum = productRes.data.productList.pages
             this.total = productRes.data.productList.total;
             this.tableData = productRes.data.productList.records;
           } else {
@@ -1349,7 +1442,7 @@ export default {
 
           // 检查 appRes 的返回数据
           if (appRes.code === "200") {
-            console.log("官网数据列表：", appRes.data);
+            console.log("官网数据列表：", appRes.data.appList);
             this.appList = appRes.data.appList;
           } else {
             console.error("官网接口错误，code：", appRes.data.code);
@@ -1369,8 +1462,8 @@ export default {
         console.log(res);
         if (res.code === "200") {
           this.tableDatas = res.data.middleList.records;
-          this.centerpageSize = res.data.middleList.size;
-          this.centerpageNum = this.centerpageNum;
+          // this.centerpageSize = res.data.middleList.size
+          // this.centerpageNum = res.data.middleList.pages
           this.totals = res.data.middleList.total;
         } else {
         }
@@ -1392,8 +1485,8 @@ export default {
           } else {
             this.tableDatas = res.data.searchData.records;
             this.totals = res.data.searchData.total;
-            this.centerpageNum = res.data.searchData.pages; //当前页码
-            this.centerpageSize = res.data.searchData.size; //每页显示条数
+            // this.centerpageNum = res.data.searchData.pages //当前页码
+            // this.centerpageSize = res.data.searchData.size //每页显示条数
           }
         } else {
         }
@@ -1419,29 +1512,6 @@ export default {
           reject(new Error("Failed to load file"));
         };
       });
-    },
-
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.getProductList();
-      console.log("???", val);
-    },
-    handleCurrentChange(val) {
-      this.pageNum = val;
-      console.log("当前页码：", val);
-
-      this.getProductList();
-    },
-    handleCenterSizeChange(val) {
-      this.centerpageSize = val;
-      this.getProductCenter();
-      console.log("???", val);
-    },
-    handleCenterCurrentChange(val) {
-      this.centerpageNum = val;
-      console.log("当前页码：", val);
-
-      this.getProductCenter();
     },
   },
   watch: {

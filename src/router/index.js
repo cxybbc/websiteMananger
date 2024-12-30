@@ -47,21 +47,24 @@ export const setRoutes = () => {
         const currentRouteNames = router.getRoutes().map(v => v.name)
         if (!currentRouteNames.includes('Manage')) {
             // 拼装动态路由
-            const manageRoute = { path: '/', name: 'Manage', component: () => import('../views/Manage.vue'), redirect: "/appManage", children: [
-                    { path: 'person', name: '个人信息', component: () => import('../views/Person.vue')},
-                    { path: 'password', name: '修改密码', component: () => import('../views/Password.vue')}
-                ] }
+            const manageRoute = {
+                path: '/', name: 'Manage', component: () => import('../views/Manage.vue'), redirect: "/appManage", children: [
+                    { path: 'person', name: '个人信息', component: () => import('../views/Person.vue') },
+                    { path: 'password', name: '修改密码', component: () => import('../views/Password.vue') }
+                ]
+            }
             const menus = JSON.parse(storeMenus)
+            console.log('菜单', menus);
             menus.forEach(item => {
                 if (item.path) {  // 当且仅当path不为空的时候才去设置路由
                     // let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: () => import('@/views/' + item.pagePath + '.vue')}
-                    let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: (resolve) => require([`@/views/${item.pagePath}.vue`], resolve)}
+                    let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: (resolve) => require([`@/views/${item.pagePath}.vue`], resolve) }
                     manageRoute.children.push(itemMenu)
-                } else if(item.children.length) {
+                } else if (item.children.length) {
                     item.children.forEach(item => {
                         if (item.path) {
                             // let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: () => import('@/views/' + item.pagePath + '.vue')}
-                            let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: (resolve) => require([`@/views/${item.pagePath}.vue`], resolve)}
+                            let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: (resolve) => require([`@/views/${item.pagePath}.vue`], resolve) }
                             manageRoute.children.push(itemMenu)
                         }
                     })
@@ -69,9 +72,9 @@ export const setRoutes = () => {
             })
             //获取当前路由对象名称数组
             const currentRouteNames = router.getRoutes().map(v => v.name)
-            if(!currentRouteNames.includes("Manage")){
-            // 动态添加到现在的路由对象中去
-            router.addRoute(manageRoute)
+            if (!currentRouteNames.includes("Manage")) {
+                // 动态添加到现在的路由对象中去
+                router.addRoute(manageRoute)
             }
         }
 
@@ -86,13 +89,13 @@ router.beforeEach((to, from, next) => {
     let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
     localStorage.setItem("currentPathName", to.name)  // 设置当前的路由名称
     store.commit("setPath")
-    if (to.path=='/login'){
-        if (user){
-            next('/appManage') 
-        }else{
+    if (to.path == '/login') {
+        if (user) {
+            next('/appManage')
+        } else {
             next()
         }
-    }else if(user) {
+    } else if (user) {
         next()
     } else {
         next('/login')
