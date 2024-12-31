@@ -3,7 +3,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = defineConfig({
   devServer: {
     port: 18062,
-    host: "localhost",
+    host: "0.0.0.0",
     https: false
   },
   // chainWebpack: config => {
