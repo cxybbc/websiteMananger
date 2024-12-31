@@ -25,7 +25,6 @@
     </div>
     <el-table
       :data="tableData"
-      :key="itemKey"
       style="width: 100%"
       border
       stripe
@@ -254,7 +253,7 @@ export default {
       tableData: [],
       appList: [],
       appWebsiteId: "",
-      total: "",
+      total: 0,
       form: {
         appWebSiteId: "",
         point: "",

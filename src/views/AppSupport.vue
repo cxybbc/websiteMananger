@@ -36,7 +36,6 @@
 
     <el-table
       :data="tableData"
-      :key="itemKey"
       style="width: 100%"
       border
       stripe
@@ -50,17 +49,16 @@
         align="center"
       ></el-table-column>
       <el-table-column
-        prop="content"
+        prop="supportContent"
         label="支持说明"
-        width="150"
+        width="350"
         align="center"
       ></el-table-column>
-      <el-table-column
-        prop="contactIds"
-        label="自媒体管理id"
-        width="150"
-        align="center"
-      ></el-table-column>
+      <el-table-column label="自媒体管理id" width="250" align="center"
+        ><template slot-scope="scope">
+          {{ formatRelation(scope.row.relation) }}
+        </template></el-table-column
+      >
       <el-table-column
         prop="appWebsiteId"
         label="所属网站"
@@ -73,21 +71,7 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="sortIndex"
-        label="排序索引"
-        width="150"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="创建时间"
-        width="150"
-        align="center"
-      >
-      </el-table-column>
-
-      <el-table-column prop="operation" label="操作" width="300" align="center">
+      <el-table-column prop="operation" label="操作" align="center">
         <template slot-scope="scope">
           <el-button type="success" @click="handleEdit(scope.row)"
             >编辑 <i class="el-icon-edit"></i
@@ -121,7 +105,6 @@
       </el-pagination>
     </div>
 
-    <!-- 新增更新记录弹窗 -->
     <el-dialog title="新增支持说明" :visible.sync="isaddAppsupport" width="40%">
       <el-form label-width="80px" size="small" ref="addForm" :model="form">
         <el-form-item
@@ -132,7 +115,10 @@
             trigger: 'blur',
           }"
         >
-          <el-input v-model="form.content" placeholder="支持说明"></el-input>
+          <el-input
+            v-model="form.content"
+            placeholder="请输入支持说明"
+          ></el-input>
         </el-form-item>
 
         <el-form-item label="自媒体关联id">
@@ -171,31 +157,31 @@
       </div>
     </el-dialog>
 
-    <!-- 编辑更新记录弹窗 -->
-    <el-dialog title="编辑更新记录" :visible.sync="iseditApprecord" width="40%">
+    <el-dialog
+      title="编辑更支持说明"
+      :visible.sync="iseditAppsupport"
+      width="40%"
+    >
       <el-form label-width="80px" size="small" ref="editForm" :model="editForm">
         <el-form-item
-          label="版本"
-          :rules="{ required: true, message: '请输入版本', trigger: 'blur' }"
-        >
-          <el-input
-            v-model="editForm.version"
-            placeholder="请输入版本"
-          ></el-input
-        ></el-form-item>
-
-        <el-form-item
-          label="更新记录"
+          label="支持说明"
           :rules="{
             required: true,
-            message: '请输入更新记录',
+            message: '请输入支持说明',
             trigger: 'blur',
           }"
         >
           <el-input
             v-model="editForm.content"
-            placeholder="请输入更新记录"
-            type="textarea"
+            placeholder="请输入支持说明'"
+          ></el-input
+        ></el-form-item>
+
+        <el-form-item label="contactIds">
+          <el-input
+            v-model="editForm.contactIds"
+            placeholder="自媒体关联id"
+            type="number"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -220,25 +206,10 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
-        <el-form-item
-          label="排序索引"
-          :rules="{
-            required: true,
-            message: '请输入排序索引',
-            trigger: 'blur',
-          }"
-        >
-          <el-input
-            v-model="editForm.sortIndex"
-            placeholder="请输入排序索引"
-            type="number"
-          ></el-input>
-        </el-form-item>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="iseditApprecord = false">取 消</el-button>
+        <el-button @click="iseditAppsupport = false">取 消</el-button>
         <el-button type="primary" @click="emitEdit">确 定</el-button>
       </div>
     </el-dialog>
@@ -255,9 +226,10 @@ export default {
       tableData: [],
       appList: [],
       appWebsiteId: "",
-      total: "",
+      total: 0,
       isaddAppsupport: false,
-      iseditApprecord: false,
+      iseditAppsupport: false,
+      searchContent: "",
       form: {
         contactIds: [],
         content: "",
@@ -268,7 +240,6 @@ export default {
         contactIds: [],
         content: "",
         appWebSiteId: "",
-        sortIndex: "",
       },
     };
   },
@@ -281,7 +252,9 @@ export default {
     save() {
       const data = {
         appWebsiteId: this.form.appWebSiteId,
-        contactIds: this.form.contactIds,
+        contactIds: Array.isArray(this.form.contactIds)
+          ? this.form.contactIds
+          : [this.form.contactIds],
         content: this.form.content,
       };
       console.log("参数", data);
@@ -305,20 +278,19 @@ export default {
     //编辑更新记录
     handleEdit(row) {
       console.log("编辑", row);
-      this.iseditApprecord = true;
+      this.iseditAppsupport = true;
       this.editForm.id = row.id;
-      this.editForm.version = row.version;
-      this.editForm.content = row.content;
+      this.editForm.contactIds = this.formatRelation(row.relation);
+      this.editForm.content = row.supportContent;
       this.editForm.appWebSiteId = row.appWebsiteId;
-      this.editForm.sortIndex = row.sortIndex;
+      console.log("编辑", this.editForm);
     },
     emitEdit() {
       const data = {
         id: this.editForm.id,
         appWebsiteId: this.editForm.appWebSiteId,
-        version: this.editForm.version,
+        contactIds: [this.editForm.contactIds],
         content: this.editForm.content,
-        sortIndex: this.editForm.sortIndex,
       };
       console.log("参数", data);
       this.request
@@ -327,7 +299,7 @@ export default {
           console.log(res);
           if (res.code == "200") {
             this.$message.success("编辑成功");
-            this.iseditApprecord = false;
+            this.iseditAppsupport = false;
             this.load();
           } else {
             this.$message.error("编辑失败");
@@ -341,8 +313,10 @@ export default {
     //删除更新记录
     handleDelete(id) {
       console.log("删除", id);
+      const formData = new FormData();
+      formData.append("id", id);
       this.request
-        .post("/support/del", { id: id })
+        .post("/support/del", formData)
         .then((res) => {
           console.log(res);
           if (res.code == "200") {
@@ -359,12 +333,13 @@ export default {
 
     //搜索
     search() {
-      console.log("搜索", this.appWebsiteId, this.pageNum, this.pageSize);
       const params = {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         appWebsiteId: this.appWebsiteId,
+        filterStr: this.searchContent || "",
       };
+      console.log("搜索", params);
       this.request
         .get("/support/search", {
           params,
@@ -390,6 +365,7 @@ export default {
     reset() {
       this.load();
       this.appWebsiteId = "";
+      this.searchContent = "";
     },
 
     //获取更新记录列表
@@ -409,6 +385,23 @@ export default {
           });
         }
       });
+    },
+    formatRelation(relation) {
+      if (!relation) return "";
+
+      try {
+        // 解析字符串为数组
+        const arr = JSON.parse(relation);
+        // 如果是数组，返回数组元素（不带括号）
+        if (Array.isArray(arr)) {
+          return arr.join(", ");
+        }
+      } catch (e) {
+        // 如果解析失败，返回原始值
+        return relation;
+      }
+
+      return relation;
     },
   },
 
@@ -446,5 +439,15 @@ header {
       }
     }
   }
+}
+:deep(.cell) {
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* 避免换行 */
+  line-height: 60px; /* 设置行高 */
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 60px !important; /* 确保行高固定 */
 }
 </style>

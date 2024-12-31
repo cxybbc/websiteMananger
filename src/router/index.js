@@ -84,35 +84,35 @@ export const setRoutes = () => {
 // 重置我就再set一次路由
 setRoutes()
 
-//路由守卫
 router.beforeEach((to, from, next) => {
-    let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
     localStorage.setItem("currentPathName", to.name)  // 设置当前的路由名称
     store.commit("setPath")
-    if (to.path == '/login') {
-        if (user) {
-            next('/appManage')
-        } else {
-            next()
-        }
-    } else if (user) {
-        next()
-    } else {
-        next('/login')
-    }
-    // 未找到路由的情况
-    if (!to.matched.length) {
-        const storeMenus = localStorage.getItem("menus")
-        if (storeMenus) {
-            next("/404")
-        } else {
-            // 跳回登录页面
-            next("/login")
-        }
-    }
-    // 其他的情况都放行
-    next()
 
-})
+    const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+    const storeMenus = localStorage.getItem("menus");
+
+    // 处理路由逻辑
+    if (!to.matched.length) {
+        // 未找到路由的情况
+        if (storeMenus) {
+            return next("/404");
+        } else {
+            return next("/login");
+        }
+    }
+
+    if (to.path === '/login') {
+        if (user) {
+            return next('/appManage');
+        }
+        return next();
+    }
+
+    if (!user) {
+        return next('/login');
+    }
+
+    next();
+});
 
 export default router

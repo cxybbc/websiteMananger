@@ -26,13 +26,11 @@
 
     <el-table
       :data="tableData"
-      :key="itemKey"
       style="width: 100%"
       border
       stripe
       :header-cell-class-name="'headerBg'"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column
         prop="id"
         label="编号"
@@ -50,6 +48,7 @@
         label="更新记录"
         width="150"
         align="center"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="appWebsiteId"
@@ -252,7 +251,7 @@ export default {
       tableData: [],
       appList: [],
       appWebsiteId: "",
-      total: "",
+      total: 0,
       isaddApprecord: false,
       iseditApprecord: false,
       form: {
@@ -435,4 +434,18 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+::deep(.el-table .cell) {
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* 避免换行 */
+  line-height: 60px !important; /* 设置行高 */
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 60px !important; /* 确保行高固定 */
+}
+.el-table__body-wrapper tbody tr {
+  height: 100px !important; /* 设置行高 */
+}
+</style>
