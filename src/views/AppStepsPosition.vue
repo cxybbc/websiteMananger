@@ -29,6 +29,7 @@
       border
       stripe
       :header-cell-class-name="'headerBg'"
+      row-key="id"
     >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column
@@ -50,6 +51,12 @@
         align="center"
       ></el-table-column>
       <el-table-column
+        prop="level"
+        label="层级"
+        width="150"
+        align="center"
+      ></el-table-column>
+      <el-table-column
         prop="appWebsiteId"
         label="所属网站"
         width="150"
@@ -61,12 +68,7 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="sortIndex"
-        label="排序索引"
-        width="150"
-        align="center"
-      ></el-table-column>
+
       <el-table-column
         prop="createTime"
         label="创建时间"
@@ -140,6 +142,19 @@
           ></el-input>
         </el-form-item>
         <el-form-item
+          label="层级"
+          :rules="{
+            required: true,
+            message: '请输入层级',
+          }"
+        >
+          <el-input
+            type="number"
+            v-model="form.level"
+            placeholder="请输入布局点"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
           label="所属官网"
           :rules="{
             required: true,
@@ -196,6 +211,19 @@
           <el-input
             type="number"
             v-model="editForm.point"
+            placeholder="请输入布局点"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="层级"
+          :rules="{
+            required: true,
+            message: '请输入层级',
+          }"
+        >
+          <el-input
+            type="number"
+            v-model="editForm.level"
             placeholder="请输入布局点"
           ></el-input>
         </el-form-item>
@@ -260,6 +288,7 @@ export default {
         pointTitle: "",
         id: "",
         sortIndex: "",
+        level: "",
       },
       editForm: {
         appWebSiteId: "",
@@ -267,6 +296,7 @@ export default {
         pointTitle: "",
         id: "",
         sortIndex: "",
+        level: "",
       },
       isStepsadd: false,
       isStepsedit: false,
@@ -306,6 +336,7 @@ export default {
         pointTitle: row.pointTitle,
         id: row.id,
         sortIndex: row.sortIndex,
+        level: row.level,
       };
       this.isStepsedit = true;
     },
@@ -316,6 +347,7 @@ export default {
         point: this.editForm.point,
         pointTitle: this.editForm.pointTitle,
         sortIndex: this.editForm.sortIndex,
+        level: this.editForm.level,
       };
       console.log("编辑", data);
       this.request.post("/stepsPoint/updatePoint", data).then((res) => {
@@ -339,6 +371,7 @@ export default {
         appWebsiteId: this.form.appWebSiteId,
         point: this.form.point,
         pointTitle: this.form.pointTitle,
+        level: this.form.level,
       };
       console.log("data", data);
       this.request.post("/stepsPoint/addPoint", data).then((res) => {
@@ -364,7 +397,6 @@ export default {
       // 创建 FormData 对象
       const formData = new FormData();
       formData.append("pointId", id);
-
       console.log("参数", formData);
 
       this.request.post("/stepsPoint/delPoint", formData).then((res) => {

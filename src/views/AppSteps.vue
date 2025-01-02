@@ -68,7 +68,7 @@
         align="center"
       ></el-table-column>
       <el-table-column
-        prop="point"
+        prop="pointTitle"
         label="布局点"
         width="150"
         align="center"
@@ -209,7 +209,20 @@
             trigger: 'blur',
           }"
         >
-          <el-input v-model="form.stepsText" autocomplete="off"></el-input>
+          <div class="editor_container" v-if="dialogFormVisible">
+            <Toolbar :editor="editorRef2" :defaultConfig="toolbarConfig2" />
+            <Editor
+              v-model="form.stepsText"
+              ref="EditorRef"
+              :defaultConfig="editorConfig2"
+              style="height: 200px; overflow-y: hidden; border: 1px solid #eee"
+              @onCreated="handleCreated2"
+              @onChange="handleChange"
+              @onDestroyed="handleDestroyed"
+              @onFocus="handleFocus"
+              @onBlur="handleBlur"
+            />
+          </div>
         </el-form-item>
         <el-form-item
           label="教程步骤序号"
@@ -227,16 +240,7 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item
-          label="教程步骤详情"
-          prop="infoContent"
-          :rules="{
-            required: true,
-            message: '请填写步骤详情',
-            trigger: 'blur',
-          }"
-          ><el-input v-model="form.infoContent"></el-input>
-        </el-form-item>
+
         <el-form-item label="步骤图">
           <el-upload
             class="upload-demo"
@@ -280,9 +284,9 @@
           <el-select clearable v-model="form.pointId" style="width: 100%">
             <el-option
               v-for="item in pointList"
-              :key="item.pointId"
-              :label="item.pointId"
-              :value="item.pointId"
+              :key="item.id"
+              :label="item.pointTitle"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -355,6 +359,22 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="教程步骤详情" prop="infoContent">
+          <div class="editor_container" v-if="dialogFormVisible">
+            <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" />
+            <Editor
+              v-model="form.infoContent"
+              ref="EditorRef"
+              :defaultConfig="editorConfig"
+              style="height: 500px; overflow-y: hidden; border: 1px solid #eee"
+              @onCreated="handleCreated"
+              @onChange="handleChange"
+              @onDestroyed="handleDestroyed"
+              @onFocus="handleFocus"
+              @onBlur="handleBlur"
+            />
+          </div>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -393,7 +413,20 @@
             trigger: 'blur',
           }"
         >
-          <el-input v-model="form.stepsText" autocomplete="off"></el-input>
+          <div class="editor_container" v-if="dialogFormVisible1">
+            <Toolbar :editor="editorRef2" :defaultConfig="toolbarConfig2" />
+            <Editor
+              v-model="form.stepsText"
+              ref="EditorRef"
+              :defaultConfig="editorConfig2"
+              style="height: 200px; overflow-y: hidden; border: 1px solid #eee"
+              @onCreated="handleCreated2"
+              @onChange="handleChange"
+              @onDestroyed="handleDestroyed"
+              @onFocus="handleFocus"
+              @onBlur="handleBlur"
+            />
+          </div>
         </el-form-item>
         <el-form-item
           label="步骤序号"
@@ -411,9 +444,7 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="教程步骤详情" prop="infoContent"
-          ><el-input v-model="form.infoContent"></el-input>
-        </el-form-item>
+
         <el-form-item label="步骤图">
           <el-input
             v-model="form.stepsAvaurl"
@@ -551,6 +582,21 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="教程步骤详情" prop="infoContent">
+          <div class="editor_container" v-if="dialogFormVisible1">
+            <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" />
+            <Editor
+              v-model="form.infoContent"
+              ref="EditorRef"
+              :defaultConfig="editorConfig"
+              style="height: 500px; overflow-y: hidden; border: 1px solid #eee"
+              @onCreated="handleCreated"
+              @onChange="handleChange"
+              @onDestroyed="handleDestroyed"
+              @onFocus="handleFocus"
+              @onBlur="handleBlur"
+            /></div
+        ></el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible1 = false">取 消</el-button>
@@ -560,11 +606,13 @@
   </div>
 </template>
 
-    <script>
+<script>
 import { serverIp } from "../../public/config";
-
+import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
+import request from "@/utils/request";
 export default {
   name: "User",
+  components: { Editor, Toolbar },
   data() {
     return {
       serverIp: serverIp,
@@ -621,6 +669,22 @@ export default {
         },
       ],
       pointList: [],
+      editorRef: null,
+      editorRef2: null,
+      toolbarConfig: {
+        mode: "simple",
+      },
+      toolbarConfig2: {
+        mode: "simple",
+      },
+      editorConfig: {
+        placeholder: "请输入内容",
+        MENU_CONF: {},
+      },
+      editorConfig2: {
+        placeholder: "请输入内容",
+        MENU_CONF: {},
+      },
     };
   },
   watch: {
@@ -676,6 +740,23 @@ export default {
     },
   },
   methods: {
+    handleCreated2(editor) {
+      this.editorRef2 = Object.seal(editor);
+    },
+    handleCreated(editor) {
+      this.editorRef = Object.seal(editor);
+    },
+    handleChange(editor) {
+      const htmlContent = editor.getHtml();
+      console.log("输入", htmlContent);
+    },
+    handleDestroyed(editor) {},
+    handleFocus(editor) {
+      console.log("获取焦点");
+    },
+    handleBlur(editor) {
+      console.log("失去焦点");
+    },
     load() {
       this.request
         .get("/stepsManage/stepsList", {
@@ -871,19 +952,42 @@ export default {
         console.log("布局点数据", res);
         //提取出所选官网的布局点
         if (res.code == "200") {
-          this.pointList = res.data.pointList.records.map((item) => ({
-            pointId: item.point,
-          }));
-          console.log("布局点", this.pointList);
-          console.log("???", this.functionList);
+          this.pointList = res.data.pointList.records;
         }
       });
     },
+  },
+  mounted() {
+    this.editorConfig.MENU_CONF["uploadImage"] = {
+      async customUpload(file, insertFn) {
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const res = await request.post("/stepsManage/upload", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              token: localStorage.getItem("user").token,
+            },
+          });
+          console.log("上传图片", res);
+          if (res.code == 200) {
+            const url = "//" + res.data.url;
+            insertFn(url);
+            this.$message.success("上传成功");
+          } else {
+            this.$message.error("上传失败");
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    };
   },
 };
 </script>
 
 <style>
+@import "@wangeditor/editor/dist/css/style.css";
 .headerBg {
   background: #eee !important;
 }
