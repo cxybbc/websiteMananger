@@ -119,6 +119,7 @@
           }"
         >
           <el-input
+            type="textarea"
             v-model="form.content"
             placeholder="请输入支持说明"
           ></el-input>
@@ -186,6 +187,7 @@
           }"
         >
           <el-input
+            type="textarea"
             v-model="editForm.content"
             placeholder="请输入支持说明'"
           ></el-input
