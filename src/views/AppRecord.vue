@@ -435,17 +435,4 @@ export default {
 </script>
 
 <style scoped>
-::deep(.el-table .cell) {
-  box-sizing: border-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; /* 避免换行 */
-  line-height: 60px !important; /* 设置行高 */
-  padding-left: 10px;
-  padding-right: 10px;
-  height: 60px !important; /* 确保行高固定 */
-}
-.el-table__body-wrapper tbody tr {
-  height: 100px !important; /* 设置行高 */
-}
 </style>

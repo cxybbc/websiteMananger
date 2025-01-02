@@ -53,10 +53,13 @@
         label="支持说明"
         width="350"
         align="center"
+        show-overflow-tooltip
       ></el-table-column>
-      <el-table-column label="自媒体管理id" width="250" align="center"
+      <el-table-column label="自媒体关联" width="250" align="center"
         ><template slot-scope="scope">
-          {{ formatRelation(scope.row.relation) }}
+          <div v-for="(item, index) in scope.row.contact" :key="index">
+            {{ item.name }}
+          </div>
         </template></el-table-column
       >
       <el-table-column
@@ -121,13 +124,6 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="自媒体关联id">
-          <el-input
-            type="number"
-            v-model="form.contactIds"
-            placeholder="自媒体关联id"
-          ></el-input>
-        </el-form-item>
         <el-form-item
           label="所属官网"
           :rules="{
@@ -141,11 +137,29 @@
             v-model="form.appWebSiteId"
             placeholder="请选择官网"
             style="width: 100%"
+            @change="getContactList"
           >
             <el-option
               v-for="item in appList"
               :key="item.id"
               :label="item.webSiteName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="自媒体关联id">
+          <el-select
+            clearable
+            v-model="form.contactIds"
+            multiple
+            placeholder="请选择关联id"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in contactList"
+              :key="item.id"
+              :label="item.navigationName"
               :value="item.id"
             ></el-option>
           </el-select>
@@ -177,13 +191,6 @@
           ></el-input
         ></el-form-item>
 
-        <el-form-item label="contactIds">
-          <el-input
-            v-model="editForm.contactIds"
-            placeholder="自媒体关联id"
-            type="number"
-          ></el-input>
-        </el-form-item>
         <el-form-item
           label="所属官网"
           :rules="{
@@ -197,6 +204,7 @@
             v-model="editForm.appWebSiteId"
             placeholder="请选择官网"
             style="width: 100%"
+            @change="editgetContactList"
           >
             <el-option
               v-for="item in appList"
@@ -204,6 +212,24 @@
               :label="item.webSiteName"
               :value="item.id"
             ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="自媒体管理">
+          <el-select
+            clearable
+            multiple
+            v-model="editForm.contactIds"
+            placeholder="请选择关联媒体"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in editcontactList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -225,6 +251,8 @@ export default {
       pageSize: 10,
       tableData: [],
       appList: [],
+      contactList: [],
+      editcontactList: [],
       appWebsiteId: "",
       total: 0,
       isaddAppsupport: false,
@@ -265,6 +293,11 @@ export default {
           if (res.code == "200") {
             this.$message.success("新增成功");
             this.isaddAppsupport = false;
+            this.form = {
+              contactIds: [],
+              content: "",
+              appWebSiteId: "",
+            };
             this.load();
           } else {
             this.$message.error("新增失败");
@@ -278,18 +311,33 @@ export default {
     //编辑更新记录
     handleEdit(row) {
       console.log("编辑", row);
-      this.iseditAppsupport = true;
-      this.editForm.id = row.id;
-      this.editForm.contactIds = this.formatRelation(row.relation);
-      this.editForm.content = row.supportContent;
-      this.editForm.appWebSiteId = row.appWebsiteId;
-      console.log("编辑", this.editForm);
+      this.request
+        .get("/support/supportInfo", {
+          params: {
+            id: row.id,
+          },
+        })
+        .then((res) => {
+          console.log("编辑", res);
+          if (res.code == "200") {
+            this.iseditAppsupport = true;
+            this.editForm.id = res.data.info.id;
+            this.editcontactList = res.data.info.contact;
+            this.editForm.contactIds = res.data.info.contact.map(
+              (item) => item.id
+            );
+            this.editForm.content = res.data.info.content;
+            this.editForm.appWebSiteId = res.data.info.appWebsiteId;
+          }
+        });
     },
     emitEdit() {
       const data = {
         id: this.editForm.id,
         appWebsiteId: this.editForm.appWebSiteId,
-        contactIds: [this.editForm.contactIds],
+        contactIds: Array.isArray(this.editForm.contactIds)
+          ? this.editForm.contactIds
+          : [this.editForm.contactIds],
         content: this.editForm.content,
       };
       console.log("参数", data);
@@ -353,6 +401,40 @@ export default {
         });
     },
 
+    //获取自媒体关联id
+    getContactList(val) {
+      console.log(val);
+      this.request
+        .post("/ngManage/searchNgManage", {
+          appWebSiteId: val,
+          pageNum: 1,
+          pageSize: 100,
+        })
+        .then((res) => {
+          this.contactList = res.data.searchData.records;
+          console.log("获取自媒体筛选数据", this.contactList);
+        });
+    },
+    //编辑获取自媒体管理id
+    editgetContactList(val) {
+      console.log(val);
+      this.editForm.contactIds = [];
+      this.request
+        .post("/ngManage/searchNgManage", {
+          appWebSiteId: val,
+          pageNum: 1,
+          pageSize: 100,
+        })
+        .then((res) => {
+          this.editcontactList = (res.data.searchData.records || []).map(
+            (item) => ({
+              ...item,
+              name: item.navigationName,
+            })
+          );
+          console.log("获取自媒体筛选数据", this.editcontactList);
+        });
+    },
     //翻页
     handleSizeChange(size) {
       this.pageSize = size;
@@ -392,7 +474,6 @@ export default {
       try {
         // 解析字符串为数组
         const arr = JSON.parse(relation);
-        // 如果是数组，返回数组元素（不带括号）
         if (Array.isArray(arr)) {
           return arr.join(", ");
         }
