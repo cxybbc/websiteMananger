@@ -228,7 +228,7 @@
           label="教程步骤序号"
           prop="stepsIndex"
           :rules="{
-            required: true,
+            required: false,
             message: '请填写步骤序号',
             trigger: 'blur',
           }"
@@ -294,7 +294,7 @@
           label="功能分类"
           prop="functionId"
           :rules="{
-            required: true,
+            required: false,
             message: '请选择功能分类',
             trigger: 'blur',
           }"
@@ -432,7 +432,7 @@
           label="步骤序号"
           prop="stepsIndex"
           :rules="{
-            required: true,
+            required: false,
             message: '步骤序号不能为空',
             trigger: 'blur',
           }"
@@ -516,7 +516,7 @@
           label="功能分类"
           prop="functionId"
           :rules="{
-            required: true,
+            required: false,
             message: '请选择功能分类',
             trigger: 'blur',
           }"
