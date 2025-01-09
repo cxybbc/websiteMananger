@@ -324,12 +324,34 @@ export default {
           if (res.code == "200") {
             this.iseditAppsupport = true;
             this.editForm.id = res.data.info.id;
-            this.editcontactList = res.data.info.contact;
-            this.editForm.contactIds = res.data.info.contact.map(
-              (item) => item.id
-            );
+            // this.editForm.contactIds = res.data.info.contact.map(
+            //   (item) => item.id
+            // );
             this.editForm.content = res.data.info.content;
             this.editForm.appWebSiteId = res.data.info.appWebsiteId;
+            console.log("当前绑定的自媒体", res.data.info.contact);
+            const contactIds = res.data.info.contact;
+            this.request
+              .post("/ngManage/searchNgManage", {
+                pageNum: 1,
+                pageSize: 100,
+                appWebSiteId: row.appWebsiteId,
+              })
+              .then((res) => {
+                console.log("所有自媒体", res.data.searchData.records);
+                this.editcontactList = (res.data.searchData.records || []).map(
+                  (item) => ({
+                    ...item,
+                    name: item.navigationName,
+                  })
+                );
+                const bounIds = (contactIds || []).map((item) => item.id);
+                this.editForm.contactIds = bounIds;
+                console.log("当前绑定的自媒体", contactIds);
+              });
+            this.request.get("/appManage/appManages").then((res) => {
+              this.appList = res.data.appList;
+            });
           }
         });
     },

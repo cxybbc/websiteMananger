@@ -78,14 +78,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="appWebSiteId"
+        prop="appWebsiteId"
         label="所属网站"
         width="150"
         align="center"
       >
         <template slot-scope="scope">
           <el-tag type="primary">{{
-            selectTag(scope.row.appWebSiteId)
+            selectTag(scope.row.appWebsiteId)
           }}</el-tag>
         </template>
       </el-table-column>

@@ -193,7 +193,7 @@
           label="教程步骤标题"
           prop="stepsTitle"
           :rules="{
-            required: true,
+            required: false,
             message: '请填写步骤标题',
             trigger: 'blur',
           }"
@@ -204,7 +204,7 @@
           label="教程步骤文本"
           prop="stepsText"
           :rules="{
-            required: true,
+            required: false,
             message: '请填写步骤文本',
             trigger: 'blur',
           }"
@@ -317,7 +317,7 @@
           label="应用分类"
           prop="applicationCategory"
           :rules="{
-            required: true,
+            required: false,
             message: '请选择功能分类',
             trigger: 'blur',
           }"
@@ -397,7 +397,7 @@
           label="步骤标题"
           prop="stepsTitle"
           :rules="{
-            required: true,
+            required: false,
             message: '步骤标题不能为空',
             trigger: 'blur',
           }"
@@ -408,7 +408,7 @@
           label="步骤文本"
           prop="stepsText"
           :rules="{
-            required: true,
+            required: false,
             message: '步骤文本不能为空',
             trigger: 'blur',
           }"
@@ -506,11 +506,14 @@
         </el-form-item>
 
         <el-form-item label="布局点" prop="pointId">
-          <el-input
-            v-model="form.pointId"
-            type="number"
-            autocomplete="off"
-          ></el-input>
+          <el-select clearable v-model="form.pointId" style="width: 100%">
+            <el-option
+              v-for="item in pointList"
+              :key="item.id"
+              :label="item.pointTitle"
+              :value="item.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item
           label="功能分类"
@@ -859,6 +862,7 @@ export default {
     },
     handleEdit(row) {
       this.form = JSON.parse(JSON.stringify(row));
+      this.changeAppWebsiteId(row.appWebsiteId);
       this.image = this.form.navigationIcon;
       this.currentId = this.form.id;
       this.dialogFormVisible1 = true;
@@ -883,6 +887,7 @@ export default {
     },
     handleAdd() {
       this.dialogFormVisible = true;
+      this.pointList.splice(0, this.pointList.length);
       this.form = {};
     },
     handleSizeChange(pageSize) {
