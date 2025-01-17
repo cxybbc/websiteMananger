@@ -11,17 +11,18 @@
         <div style="padding: 10px 0">
             <el-button type="primary" @click="handleAdd">新增<i class="el-icon-circle-plus-outline"></i></el-button>
         </div>
-        <el-table :data="tableData" style="width: 100%" border stripe :header-cell-class-name="'headerBg'">
+        <el-table :data="tableData" style="width: 100%" border stripe :header-cell-class-name="'headerBg'" row-key="id">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="id" label="编号" width="150" align="center"></el-table-column>
             <el-table-column prop="pointTitle" label="布局点标题" width="150" align="center"></el-table-column>
             <el-table-column prop="point" label="布局点" width="150" align="center"></el-table-column>
+            <el-table-column prop="level" label="层级" width="150" align="center"></el-table-column>
             <el-table-column prop="appWebsiteId" label="所属网站" width="150" align="center">
                 <template slot-scope="scope">
                     <el-tag type="primary">{{ selectTag(scope.row.appWebsiteId) }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="sortIndex" label="排序索引" width="150" align="center"></el-table-column>
+
             <el-table-column prop="createTime" label="创建时间" width="150" align="center"> </el-table-column>
 
             <el-table-column prop="operation" label="操作" width="300" align="center">
@@ -57,6 +58,14 @@
                         trigger: 'blur'
                     }">
                     <el-input type="number" v-model="form.point" placeholder="请输入布局点"></el-input>
+                </el-form-item>
+                <el-form-item
+                    label="层级"
+                    :rules="{
+                        required: true,
+                        message: '请输入层级'
+                    }">
+                    <el-input type="number" v-model="form.level" placeholder="请输入布局点"></el-input>
                 </el-form-item>
                 <el-form-item
                     label="所属官网"
@@ -97,6 +106,14 @@
                         trigger: 'blur'
                     }">
                     <el-input type="number" v-model="editForm.point" placeholder="请输入布局点"></el-input>
+                </el-form-item>
+                <el-form-item
+                    label="层级"
+                    :rules="{
+                        required: true,
+                        message: '请输入层级'
+                    }">
+                    <el-input type="number" v-model="editForm.level" placeholder="请输入布局点"></el-input>
                 </el-form-item>
                 <el-form-item
                     label="排序索引"
@@ -142,14 +159,16 @@ export default {
                 point: '',
                 pointTitle: '',
                 id: '',
-                sortIndex: ''
+                sortIndex: '',
+                level: ''
             },
             editForm: {
                 appWebSiteId: '',
                 point: '',
                 pointTitle: '',
                 id: '',
-                sortIndex: ''
+                sortIndex: '',
+                level: ''
             },
             isStepsadd: false,
             isStepsedit: false
@@ -188,7 +207,8 @@ export default {
                 point: row.point,
                 pointTitle: row.pointTitle,
                 id: row.id,
-                sortIndex: row.sortIndex
+                sortIndex: row.sortIndex,
+                level: row.level
             }
             this.isStepsedit = true
         },
@@ -198,7 +218,8 @@ export default {
                 appWebsiteId: this.editForm.appWebSiteId,
                 point: this.editForm.point,
                 pointTitle: this.editForm.pointTitle,
-                sortIndex: this.editForm.sortIndex
+                sortIndex: this.editForm.sortIndex,
+                level: this.editForm.level
             }
             console.log('编辑', data)
             this.request.post('/stepsPoint/updatePoint', data).then(res => {
@@ -221,7 +242,8 @@ export default {
             const data = {
                 appWebsiteId: this.form.appWebSiteId,
                 point: this.form.point,
-                pointTitle: this.form.pointTitle
+                pointTitle: this.form.pointTitle,
+                level: this.form.level
             }
             console.log('data', data)
             this.request.post('/stepsPoint/addPoint', data).then(res => {
