@@ -380,7 +380,7 @@
     >
       <div class="preview_content" style="height: 500px; overflow-y: auto">
         <div v-if="assortList.length === 0" class="empty-message">
-          <p style="text-align: center">没有数据可显示</p>
+          <p style="text-align: center">没有数据可显示,需进行分配</p>
         </div>
         <draggable
           v-model="assortList"
@@ -427,12 +427,8 @@
         <el-button type="primary" @click="previewcenterselectall"
           >全部选中</el-button
         >
-        <el-button type="danger" @click="previewcenterdelete"
-          >删除所选</el-button
-        >
-        <el-button type="primary" @click="isproductPreview = false"
-          >保存</el-button
-        >
+        <el-button type="danger" @click="previewDelete">删除所选</el-button>
+        <el-button type="primary" @click="previewcenter">保存</el-button>
       </div>
     </el-dialog>
 
@@ -1078,14 +1074,14 @@ export default {
       this.isproductPreview = true;
       this.middleID = row.id;
       const params = {
-        productId: row.id,
+        productId: this.middleID,
       };
       this.request.get("/middle/assortMiddle", { params }).then((res) => {
         console.log(res);
         if (res.code === "200") {
           this.assortList = res.data.assortList.map((item) => ({
             ...item,
-            selected: false,
+            selected: true,
           }));
         } else {
           this.assortList = [];
@@ -1358,7 +1354,7 @@ export default {
             if (res.code === "200") {
               this.assortList = res.data.assortList.map((item) => ({
                 ...item,
-                selected: false,
+                selected: true,
               }));
             } else {
               this.assortList = [];
@@ -1378,36 +1374,82 @@ export default {
         item.selected = true;
       });
     },
-    previewcenterdelete() {
-      const unselectedItems = this.assortList.filter((item) => !item.selected);
+    previewcenter() {
+      const unselectedItems = this.assortList.filter((item) => item.selected);
       const unselectedIds = unselectedItems.map((item) => item.id);
-      console.log("未选中的 id:", unselectedIds);
+      if (!unselectedIds.length) {
+        this.$message.error("请选择分配内容");
+        return;
+      }
+
       const data = {
         ids: unselectedIds,
         productIds: [this.middleID],
       };
 
+      console.log("选中的 id参数", unselectedIds);
+
       this.request.post("/middle/rationMiddle", data).then((res) => {
         console.log(res);
         if (res.code === "200") {
-          this.$message.success("移除成功");
-
+          this.$message.success("分配成功");
+          this.isproductPreview = false;
           const params = {
             productId: this.middleID,
           };
-          this.request.get("/middle/assortMiddle", { params }).then((res) => {
-            console.log(res);
-            if (res.code === "200") {
-              this.assortList = res.data.assortList.map((item) => ({
-                ...item,
-                selected: false,
-              }));
-            } else {
-              this.assortList = [];
-            }
-          });
+          // this.request.get("/middle/assortMiddle", { params }).then((res) => {
+          //   console.log(res);
+          //   if (res.code === "200") {
+          //     this.assortList = res.data.assortList.map((item) => ({
+          //       ...item,
+          //       selected: false,
+          //     }));
+          //   } else {
+          //     this.assortList = [];
+          //   }
+          // });
         } else {
-          this.$message.error("移除失败");
+          this.$message.error("分配失败");
+        }
+      });
+    },
+    previewDelete() {
+      console.log("删除所选", this.assortList, this.middleID);
+      const unselectedItems = this.assortList.filter((item) => item.selected);
+      const unselectedIds = unselectedItems.map((item) => item.id);
+      console.log("???????????", unselectedIds);
+
+      if (!unselectedIds.length) {
+        this.$message.error("请选择分配内容");
+        return;
+      }
+
+      const data = {
+        ids: unselectedIds,
+        productIds: [this.middleID],
+      };
+      console.log("删除参数", data);
+      this.request.post("/middle/relieveMiddle", data).then((res) => {
+        console.log(res);
+        if (res.code === "200") {
+          this.$message.success("删除成功");
+          this.isproductPreview = false;
+          const params = {
+            productId: this.middleID,
+          };
+          // this.request.get("/middle/assortMiddle", { params }).then((res) => {
+          //   console.log(res);
+          //   if (res.code === "200") {
+          //     this.assortList = res.data.assortList.map((item) => ({
+          //       ...item,
+          //       selected: false,
+          //     }));
+          //   } else {
+          //     this.assortList = [];
+          //   }
+          // });
+        } else {
+          this.$message.error("删除失败");
         }
       });
     },
