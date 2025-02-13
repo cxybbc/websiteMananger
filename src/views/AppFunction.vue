@@ -435,11 +435,11 @@
                         <el-input
                             v-model="param.param"
                             style="flex: 1; margin-right: 5px"
-                            placeholder="请输入深度链接参数"></el-input>
+                            placeholder="请输入深度链接参数Key"></el-input>
                         <el-input
                             v-model="param.value"
                             style="flex: 1; margin-right: 5px"
-                            placeholder="请输入深度链接参数值" />
+                            placeholder="请输入深度链接参数Value" />
                         <el-button
                             type="danger"
                             @click="removeRow(index, paramsIndex)"
@@ -496,7 +496,7 @@ export default {
             tableData: [],
             total: 0,
             pageNum: 1,
-            pageSize: 10,
+            pageSize: 15,
             // integration: "",
             username: '',
             form: {
@@ -591,7 +591,12 @@ export default {
                         if (res.code === '200') {
                             this.$message.success('保存成功')
                             this.dialogFormVisible = false
-                            this.load()
+
+                            if (this.username) {
+                                this.search()
+                            } else {
+                                this.load()
+                            }
                             this.form = {}
                         } else {
                             res.msg
@@ -611,7 +616,12 @@ export default {
                         if (res.code === '200') {
                             this.$message.success('保存成功')
                             this.dialogFormVisible1 = false
-                            this.load()
+                            if (this.username) {
+                                this.search()
+                            } else {
+                                this.load()
+                            }
+
                             this.form = {}
                         } else {
                             this.$message.error(res.msg)
@@ -739,7 +749,11 @@ export default {
                 .then(res => {
                     if (res.code === '200') {
                         this.$message.success('删除成功')
-                        this.load()
+                        if (this.username) {
+                            this.search()
+                        } else {
+                            this.load()
+                        }
                     } else {
                         this.$message.error('删除失败')
                     }
@@ -749,6 +763,20 @@ export default {
             this.dialogFormVisible = true
             this.form = {}
             this.deepLinkView = []
+            this.deepLinkForm = {
+                depth_link: '',
+                params: [
+                    {
+                        system: '',
+                        params: [
+                            {
+                                param: '',
+                                value: ''
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         handleSizeChange(pageSize) {
             this.pageSize = pageSize
