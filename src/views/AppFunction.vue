@@ -432,19 +432,33 @@
                     <div
                         class="paramsRow"
                         v-for="(param, paramsIndex) in item.params">
-                        <el-input
-                            v-model="param.param"
-                            style="flex: 1; margin-right: 5px"
-                            placeholder="请输入深度链接参数Key"></el-input>
-                        <el-input
-                            v-model="param.value"
-                            style="flex: 1; margin-right: 5px"
-                            placeholder="请输入深度链接参数Value" />
-                        <el-button
-                            type="danger"
-                            @click="removeRow(index, paramsIndex)"
-                            >删除参数</el-button
-                        >
+                        <template v-if="!param.isCommon">
+                            <el-input
+                                v-model="param.param"
+                                style="flex: 1; margin-right: 5px"
+                                placeholder="请输入深度链接参数Key"></el-input>
+                            <el-input
+                                v-model="param.value"
+                                style="flex: 1; margin-right: 5px"
+                                placeholder="请输入深度链接参数Value" />
+                            <el-button
+                                type="danger"
+                                @click="removeRow(index, paramsIndex)"
+                                >删除参数</el-button
+                            >
+                        </template>
+                        <template v-else>
+                            <el-input
+                                v-model="param.param"
+                                style="flex: 1; margin-right: 5px"
+                                placeholder="请输入深度链接通用参数Key"></el-input>
+
+                            <el-button
+                                type="danger"
+                                @click="removeRow(index, paramsIndex)"
+                                >删除参数</el-button
+                            >
+                        </template>
                     </div>
                     <div>
                         <el-button
@@ -457,6 +471,17 @@
                                 })
                             ">
                             添加参数</el-button
+                        >
+                        <el-button
+                            style="margin-top: 5px"
+                            type="primary"
+                            @click="
+                                item.params.push({
+                                    param: '',
+                                    isCommon: true
+                                })
+                            ">
+                            添加通用参数</el-button
                         >
                     </div>
                 </li>
@@ -698,6 +723,7 @@ export default {
                 // }
                 const deeplinklist = []
                 const depthLinkParam = JSON.parse(res.data.functionInfo.depthLinkParam)
+                console.log('depthLinkParam',depthLinkParam);
                 depthLinkParam.forEach(item => {
                     let params
                     if (item.params.length) {
