@@ -87,7 +87,7 @@ setRoutes()
 router.beforeEach((to, from, next) => {
     localStorage.setItem("currentPathName", to.name)  // 设置当前的路由名称
     store.commit("setPath")
-
+    console.log('测试');
     const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
     const storeMenus = localStorage.getItem("menus");
 
