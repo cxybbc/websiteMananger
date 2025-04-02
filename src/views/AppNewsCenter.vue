@@ -1,34 +1,64 @@
 <template>
     <div>
-        <editorNew :isloading="detailLoading" :isShow="isShowEditorBox" :newDetailInfo="newDetailInfo" @refresh="hideDialog" />
+        <editorNew
+            :isloading="detailLoading"
+            :isShow="isShowEditorBox"
+            :newDetailInfo="newDetailInfo"
+            @refresh="hideDialog" />
         <h1>新闻中心</h1>
         <header>
             <div class="selectBox">
                 <div class="selectBox_item">
                     <p>应用站点：</p>
-                    <el-select v-model="serachWebId" placeholder="请选择">
-                        <el-option v-for="item in webList" :key="item.id" :label="item.webSiteName" :value="item.id" />
+                    <el-select
+                        v-model="serachWebId"
+                        placeholder="请选择">
+                        <el-option
+                            v-for="item in webList"
+                            :key="item.id"
+                            :label="item.webSiteName"
+                            :value="item.id" />
                     </el-select>
                 </div>
                 <div class="selectBox_item">
                     <p>新闻标题：</p>
-                    <el-input v-model="serachTitle" placeholder="请输入新闻标题" />
+                    <el-input
+                        v-model="serachTitle"
+                        placeholder="请输入新闻标题" />
                 </div>
                 <div class="searchbtn">
-                    <el-button type="primary" @click="seraching">搜索</el-button>
+                    <el-button
+                        type="primary"
+                        @click="seraching"
+                        >搜索</el-button
+                    >
                 </div>
                 <div class="searchbtn">
                     <el-button @click="reset">重置</el-button>
                 </div>
             </div>
-            <el-button type="primary" @click="addNew">新增新闻</el-button>
+            <el-button
+                type="primary"
+                @click="addNew"
+                >新增新闻</el-button
+            >
         </header>
         <main>
-            <el-table v-loading="isNewsLoading" :data="tableData" style="width: 100%" height="700">
-                <el-table-column type="selection" width="55" />
-                <el-table-column prop="id" label="id" />
+            <el-table
+                v-loading="isNewsLoading"
+                :data="tableData"
+                style="width: 100%"
+                height="700">
+                <el-table-column
+                    type="selection"
+                    width="55" />
+                <el-table-column
+                    prop="id"
+                    label="id" />
 
-                <el-table-column prop="title" label="标题" />
+                <el-table-column
+                    prop="title"
+                    label="标题" />
                 <el-table-column label="是否置顶">
                     <template #default="scope">
                         {{ scope.row.isTop ? '是' : '否' }}
@@ -40,7 +70,9 @@
                 </el-table-column>
                 <el-table-column label="已应用网站">
                     <template #default="scope">
-                        <ul v-for="item in scope.row.appWebsiteIdList" :key="item.appWebsiteId">
+                        <ul
+                            v-for="item in scope.row.appWebsiteIdList"
+                            :key="item.appWebsiteId">
                             {{
                                 item.appWebsiteName
                             }}
@@ -49,26 +81,49 @@
                 </el-table-column>
                 <el-table-column label="封面图">
                     <template #default="scope">
-                        <img :src="scope.row.cover" style="object-fit: contain; height: 100px" alt="" />
+                        <img
+                            :src="scope.row.cover"
+                            style="object-fit: contain; height: 100px"
+                            alt="" />
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="创建时间">
+                <el-table-column
+                    prop="createTime"
+                    label="创建时间">
                     <template #default="scope"> {{ initeCreateDate(scope.row.createTime) }} </template>
                 </el-table-column>
-                <el-table-column prop="action" label="操作">
+                <el-table-column
+                    prop="action"
+                    label="操作">
                     <template #default="scope">
-                        <el-button size="small" @click="handleEdit(scope.row)"> 修改 </el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.row)"> 删除 </el-button>
+                        <el-button
+                            size="small"
+                            @click="handleEdit(scope.row)">
+                            修改
+                        </el-button>
+                        <el-button
+                            size="small"
+                            type="danger"
+                            @click="handleDelete(scope.row)">
+                            删除
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
-            <el-pagination class="pagination" @current-change="PaginaitonChange" background layout="prev, pager, next" :page-size="pageSize" :current-page="currentpage1" :total="total1" />
+            <el-pagination
+                class="pagination"
+                @current-change="PaginaitonChange"
+                background
+                layout="prev, pager, next"
+                :page-size="pageSize"
+                :current-page="currentpage1"
+                :total="total1" />
         </main>
     </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import {defineComponent} from 'vue'
 import request from '@/utils/request'
 import editorNew from '@/components/dialog/editorNew.vue'
 import dayjs from 'dayjs'
@@ -105,6 +160,7 @@ export default defineComponent({
             this.getNewsList()
         },
         seraching() {
+            this.currentpage1 = 1
             this.serachNews()
         },
         PaginaitonChange(page) {
@@ -123,6 +179,7 @@ export default defineComponent({
         async serachNews() {
             try {
                 this.isNewsLoading = true
+
                 const res = await request.get('/news/searchNewsManage', {
                     params: {
                         pageNum: this.currentpage1,
@@ -265,7 +322,7 @@ export default defineComponent({
         this.getWebSiteList()
         this.getNewsList()
     },
-    components: { editorNew }
+    components: {editorNew}
 })
 </script>
 
