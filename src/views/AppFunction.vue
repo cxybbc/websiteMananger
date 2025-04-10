@@ -1,221 +1,100 @@
 <template>
     <div>
         <div style="padding: 10px 0; text-align: right">
-            <el-select
-                clearable
-                v-model="username"
-                placeholder="请选择官网"
-                style="width: 400px">
-                <el-option
-                    v-for="item in appList"
-                    :key="item.id"
-                    :label="item.webSiteName"
+            <el-select clearable v-model="username" placeholder="请选择官网" style="width: 400px">
+                <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
                     :value="item.id"></el-option>
             </el-select>
-            <el-button
-                class="ml-5"
-                type="primary"
-                @click="search"
-                >搜索</el-button
-            >
-            <el-button
-                type="warning"
-                @click="reset"
-                >重置</el-button
-            >
+            <el-button class="ml-5" type="primary" @click="search">搜索</el-button>
+            <el-button type="warning" @click="reset">重置</el-button>
         </div>
         <div style="padding: 10px 0">
-            <el-button
-                type="primary"
-                @click="handleAdd"
-                >新增<i class="el-icon-circle-plus-outline"></i
-            ></el-button>
-            <el-popconfirm
-                class="ml-5"
-                confirm-button-text="确定"
-                cancel-button-text="取消"
-                icon="el-icon-info"
-                icon-color="red"
-                title="您确定删除吗？"
-                @confirm="deleteBatch">
+            <el-button type="primary" @click="handleAdd">新增<i class="el-icon-circle-plus-outline"></i></el-button>
+            <el-popconfirm class="ml-5" confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info"
+                icon-color="red" title="您确定删除吗？" @confirm="deleteBatch">
                 <!-- <el-button type="danger" slot="reference">批量删除<i class="el-icon-remove-outline"></i></el-button> -->
             </el-popconfirm>
         </div>
-        <el-table
-            :data="tableData"
-            :key="itemKey"
-            style="width: 100%"
-            border
-            stripe
-            :header-cell-class-name="'headerBg'"
-            @selection-change="handleSelectionChange">
-            <el-table-column
-                type="selection"
-                width="55"></el-table-column>
-            <el-table-column
-                prop="id"
-                label="编号"
-                align="center"></el-table-column>
-            <el-table-column
-                prop="functionName"
-                label="功能名称"
-                align="center"></el-table-column>
-            <el-table-column
-                prop="appWebSiteId"
-                label="所属网站"
-                align="center">
+        <el-table :data="tableData" :key="itemKey" style="width: 100%" border stripe
+            :header-cell-class-name="'headerBg'" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column prop="id" label="编号" align="center"></el-table-column>
+            <el-table-column prop="functionName" label="功能名称" align="center"></el-table-column>
+            <el-table-column prop="appWebSiteId" label="所属网站" align="center">
                 <template slot-scope="scope">
                     <el-tag type="primary">{{ selectTag(scope.row.appWebSiteId) }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column
-                prop="numberUse"
-                label="使用次数"
-                align="center"></el-table-column>
-            <el-table-column
-                prop="numberThreshold"
-                label="计数阈值"
-                align="center"></el-table-column>
-            <el-table-column
-                prop="probability"
-                label="触发概率"
-                w
-                align="center"></el-table-column>
-            <el-table-column
-                prop="operation"
-                label="操作"
-                width="300"
-                align="center">
+            <el-table-column prop="numberUse" label="使用次数" align="center"></el-table-column>
+            <el-table-column prop="numberThreshold" label="计数阈值" align="center"></el-table-column>
+            <el-table-column prop="probability" label="触发概率" w align="center"></el-table-column>
+            <el-table-column prop="operation" label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button
-                        type="success"
-                        @click="handleEdit(scope.row)"
-                        >编辑 <i class="el-icon-edit"></i
-                    ></el-button>
-                    <el-popconfirm
-                        class="ml-5"
-                        confirm-button-text="确定"
-                        cancel-button-text="取消"
-                        icon="el-icon-info"
-                        icon-color="red"
-                        title="您确定删除吗？"
-                        @confirm="handleDelete(scope.row.id)">
-                        <el-button
-                            type="danger"
-                            slot="reference"
-                            >删除<i class="el-icon-remove-outline"></i
-                        ></el-button>
+                    <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
+                    <el-popconfirm class="ml-5" confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info"
+                        icon-color="red" title="您确定删除吗？" @confirm="handleDelete(scope.row.id)">
+                        <el-button type="danger" slot="reference">删除<i class="el-icon-remove-outline"></i></el-button>
                     </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
         <!--分页 选页面-->
         <div style="padding: 10px 0">
-            <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="pageNum"
-                :page-sizes="[5, 10, 15, 20, 25]"
-                :page-size="pageSize"
-                layout="total, sizes, prev, pager, next, jumper"
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNum"
+                :page-sizes="[5, 10, 15, 20, 25]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
                 :total="total">
             </el-pagination>
         </div>
-        <el-dialog
-            title="新增功能信息"
-            :visible.sync="dialogFormVisible"
-            width="30%">
-            <el-form
-                label-width="80px"
-                size="small"
-                :model="form"
-                ref="addForm">
-                <el-form-item
-                    label="功能名称"
-                    prop="functionName"
-                    :rules="{
-                        required: true,
-                        message: '功能名称不能为空',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        v-model="form.functionName"
-                        autocomplete="off"></el-input>
+        <el-dialog title="新增功能信息" :visible.sync="dialogFormVisible" width="30%">
+            <el-form label-width="80px" size="small" :model="form" ref="addForm">
+                <el-form-item label="功能名称" prop="functionName" :rules="{
+                    required: true,
+                    message: '功能名称不能为空',
+                    trigger: 'blur'
+                }">
+                    <el-input v-model="form.functionName" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="所属官网"
-                    prop="appWebSiteId"
-                    :rules="{
-                        required: true,
-                        message: '请选择所属官网',
-                        trigger: 'blur'
-                    }">
-                    <el-select
-                        clearable
-                        v-model="form.appWebSiteId"
-                        placeholder="请选择官网"
-                        style="width: 100%">
-                        <el-option
-                            v-for="item in appList"
-                            :key="item.id"
-                            :label="item.webSiteName"
+                <el-form-item label="所属官网" prop="appWebSiteId" :rules="{
+                    required: true,
+                    message: '请选择所属官网',
+                    trigger: 'blur'
+                }">
+                    <el-select clearable v-model="form.appWebSiteId" placeholder="请选择官网" style="width: 100%">
+                        <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
                             :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item
-                    label="使用次数"
-                    prop="numberUse"
-                    :rules="{
-                        required: true,
-                        message: '请分配默认使用次数',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        type="number"
-                        v-model="form.numberUse"
-                        autocomplete="off"></el-input>
+                <el-form-item label="使用次数" prop="numberUse" :rules="{
+                    required: true,
+                    message: '请分配默认使用次数',
+                    trigger: 'blur'
+                }">
+                    <el-input type="number" v-model="form.numberUse" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="计数阈值"
-                    prop="numberThreshold"
-                    :rules="{
-                        required: true,
-                        message: '请填写默认技术阈值',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        type="number"
-                        v-model="form.numberThreshold"
-                        autocomplete="off"></el-input>
+                <el-form-item label="计数阈值" prop="numberThreshold" :rules="{
+                    required: true,
+                    message: '请填写默认技术阈值',
+                    trigger: 'blur'
+                }">
+                    <el-input type="number" v-model="form.numberThreshold" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="触发概率"
-                    prop="probability"
-                    :rules="{
-                        required: true,
-                        message: '请填写默认触发概率',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        v-model="form.probability"
-                        autocomplete="off"></el-input>
+                <el-form-item label="触发概率" prop="probability" :rules="{
+                    required: true,
+                    message: '请填写默认触发概率',
+                    trigger: 'blur'
+                }">
+                    <el-input v-model="form.probability" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="深度链接">
                     <div class="deep-link-container">
                         <template v-if="deepLinkView.length">
-                            <div
-                                v-for="(deep, index) in deepLinkView"
-                                :key="index"
-                                class="deep-link-item">
+                            <div v-for="(deep, index) in deepLinkView" :key="index" class="deep-link-item">
                                 <span class="system-label">
                                     {{ deep.system }}
                                 </span>
                                 <div class="url-wrapper">
                                     <p class="url-text">{{ deep.depthLinkUrl }}</p>
-                                    <el-button
-                                        type="primary"
-                                        size="small"
-                                        class="copy-btn"
+                                    <el-button type="primary" size="small" class="copy-btn"
                                         @click="copyUrl(deep.depthLinkUrl)">
                                         复制
                                     </el-button>
@@ -224,138 +103,75 @@
                         </template>
 
                         <!-- 空状态 -->
-                        <div
-                            v-else
-                            class="empty-state">
-                            <el-empty
-                                :image-size="120"
-                                description="暂无数据">
+                        <div v-else class="empty-state">
+                            <el-empty :image-size="120" description="暂无数据">
                                 <template #description>
                                     <p class="empty-text">暂无深度链接数据</p>
                                 </template>
                             </el-empty>
                         </div>
                     </div>
-                    <el-button
-                        type="primary"
-                        @click="eidtorDeepLink"
-                        >编辑</el-button
-                    >
+                    <el-button type="primary" @click="eidtorDeepLink">编辑</el-button>
                 </el-form-item>
             </el-form>
-            <div
-                slot="footer"
-                class="dialog-footer">
+            <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button
-                    type="primary"
-                    @click="save"
-                    >确 定</el-button
-                >
+                <el-button type="primary" @click="save">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog
-            title="修改功能信息"
-            :visible.sync="dialogFormVisible1"
-            width="30%">
-            <el-form
-                label-width="80px"
-                size="small"
-                :model="form"
-                ref="editForm">
-                <el-form-item
-                    label="功能ID"
-                    v-if="false">
-                    <el-input
-                        v-model="form.id"
-                        autocomplete="off"></el-input>
+        <el-dialog title="修改功能信息" :visible.sync="dialogFormVisible1" width="30%">
+            <el-form label-width="80px" size="small" :model="form" ref="editForm">
+                <el-form-item label="功能ID" v-if="false">
+                    <el-input v-model="form.id" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="功能名称"
-                    prop="functionName"
-                    :rules="{
-                        required: true,
-                        message: '功能名称不能为空',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        v-model="form.functionName"
-                        autocomplete="off"></el-input>
+                <el-form-item label="功能名称" prop="functionName" :rules="{
+                    required: true,
+                    message: '功能名称不能为空',
+                    trigger: 'blur'
+                }">
+                    <el-input v-model="form.functionName" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="所属官网"
-                    prop="appWebSiteId"
-                    :rules="{
-                        required: true,
-                        message: '请选择所属官网',
-                        trigger: 'blur'
-                    }">
-                    <el-select
-                        clearable
-                        v-model="form.appWebSiteId"
-                        placeholder="请选择官网"
-                        style="width: 100%">
-                        <el-option
-                            v-for="item in appList"
-                            :key="item.id"
-                            :label="item.webSiteName"
+                <el-form-item label="所属官网" prop="appWebSiteId" :rules="{
+                    required: true,
+                    message: '请选择所属官网',
+                    trigger: 'blur'
+                }">
+                    <el-select clearable v-model="form.appWebSiteId" placeholder="请选择官网" style="width: 100%">
+                        <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
                             :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item
-                    label="使用次数"
-                    prop="numberUse"
-                    :rules="{
-                        required: true,
-                        message: '功能使用次数不能为空',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        type="number"
-                        v-model="form.numberUse"
-                        autocomplete="off"></el-input>
+                <el-form-item label="使用次数" prop="numberUse" :rules="{
+                    required: true,
+                    message: '功能使用次数不能为空',
+                    trigger: 'blur'
+                }">
+                    <el-input type="number" v-model="form.numberUse" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="计数阈值"
-                    prop="numberThreshold"
-                    :rules="{
-                        required: true,
-                        message: '计数阈值不能为空',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        type="number"
-                        v-model="form.numberThreshold"
-                        autocomplete="off"></el-input>
+                <el-form-item label="计数阈值" prop="numberThreshold" :rules="{
+                    required: true,
+                    message: '计数阈值不能为空',
+                    trigger: 'blur'
+                }">
+                    <el-input type="number" v-model="form.numberThreshold" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="触发概率"
-                    prop="probability"
-                    :rules="{
-                        required: true,
-                        message: '功能触发概率不能为空',
-                        trigger: 'blur'
-                    }">
-                    <el-input
-                        v-model="form.probability"
-                        autocomplete="off"></el-input>
+                <el-form-item label="触发概率" prop="probability" :rules="{
+                    required: true,
+                    message: '功能触发概率不能为空',
+                    trigger: 'blur'
+                }">
+                    <el-input v-model="form.probability" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="深度链接">
                     <div class="deep-link-container">
                         <template v-if="deepLinkView.length">
-                            <div
-                                v-for="(deep, index) in deepLinkView"
-                                :key="index"
-                                class="deep-link-item">
+                            <div v-for="(deep, index) in deepLinkView" :key="index" class="deep-link-item">
                                 <span class="system-label">
                                     {{ deep.system }}
                                 </span>
                                 <div class="url-wrapper">
                                     <p class="url-text">{{ deep.depthLinkUrl }}</p>
-                                    <el-button
-                                        type="primary"
-                                        size="small"
-                                        class="copy-btn"
+                                    <el-button type="primary" size="small" class="copy-btn"
                                         @click="copyUrl(deep.depthLinkUrl)">
                                         复制
                                     </el-button>
@@ -364,153 +180,86 @@
                         </template>
 
                         <!-- 空状态 -->
-                        <div
-                            v-else
-                            class="empty-state">
-                            <el-empty
-                                :image-size="120"
-                                description="暂无数据">
+                        <div v-else class="empty-state">
+                            <el-empty :image-size="120" description="暂无数据">
                                 <template #description>
                                     <p class="empty-text">暂无深度链接数据</p>
                                 </template>
                             </el-empty>
                         </div>
                     </div>
-                    <el-button
-                        type="primary"
-                        @click="eidtorDeepLink"
-                        >编辑</el-button
-                    >
+                    <el-button type="primary" @click="eidtorDeepLink">编辑</el-button>
                 </el-form-item>
             </el-form>
-            <div
-                slot="footer"
-                class="dialog-footer">
+            <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible1 = false">取 消</el-button>
-                <el-button
-                    type="primary"
-                    @click="edit"
-                    >确 定</el-button
-                >
+                <el-button type="primary" @click="edit">确 定</el-button>
             </div>
         </el-dialog>
         <!-- 编辑深度链接 -->
-        <el-dialog
-            title="深度链接"
-            :visible.sync="isEditorDeeplink"
-            :before-close="
-                () => {
-                    isEditorDeeplink = false
-                }
-            "
-            width="40%">
+        <el-dialog title="深度链接" :visible.sync="isEditorDeeplink" :before-close="() => {
+                isEditorDeeplink = false
+            }
+            " width="40%">
             <ul class="deeplinkContent">
                 <li class="scheme_row">
-                    <el-input
-                        v-model="deepLinkForm.depthLink"
-                        placeholder="请输入深度链接"></el-input>
+                    <el-input v-model="deepLinkForm.depthLink" placeholder="请输入深度链接"></el-input>
                 </li>
-                <li
-                    class="input_item"
-                    v-for="(item, index) in deepLinkForm.params"
-                    :key="item.deepName">
+                <li class="input_item" v-for="(item, index) in deepLinkForm.params" :key="item.deepName">
                     <div class="systemRow">
-                        <el-select
-                            v-model="item.system"
-                            placeholder="请选择系统">
-                            <el-option
-                                v-for="el in system"
-                                :key="el.value"
-                                :label="el.label"
+                        <el-select v-model="item.system" placeholder="请选择系统">
+                            <el-option v-for="el in system" :key="el.value" :label="el.label"
                                 :value="el.value"></el-option>
                         </el-select>
-                        <i
-                            class="el-icon-circle-close"
-                            style="cursor: pointer"
-                            @click="deleteSystem(index)"></i>
+                        <i class="el-icon-circle-close" style="cursor: pointer" @click="deleteSystem(index)"></i>
                     </div>
-                    <div
-                        class="paramsRow"
-                        v-for="(param, paramsIndex) in item.params">
+                    <div class="paramsRow" v-for="(param, paramsIndex) in item.params">
                         <template v-if="!param.isCommon">
-                            <el-input
-                                v-model="param.param"
-                                style="flex: 1; margin-right: 5px"
+                            <el-input v-model="param.param" style="flex: 1; margin-right: 5px"
                                 placeholder="请输入深度链接参数Key"></el-input>
-                            <el-input
-                                v-model="param.value"
-                                style="flex: 1; margin-right: 5px"
+                            <el-input v-model="param.value" style="flex: 1; margin-right: 5px"
                                 placeholder="请输入深度链接参数Value" />
-                            <el-button
-                                type="danger"
-                                @click="removeRow(index, paramsIndex)"
-                                >删除参数</el-button
-                            >
+                            <el-button type="danger" @click="removeRow(index, paramsIndex)">删除参数</el-button>
                         </template>
                         <template v-else>
-                            <el-input
-                                v-model="param.param"
-                                style="flex: 1; margin-right: 5px"
+                            <el-input v-model="param.param" style="flex: 1; margin-right: 5px"
                                 placeholder="请输入深度链接通用参数Key"></el-input>
 
-                            <el-button
-                                type="danger"
-                                @click="removeRow(index, paramsIndex)"
-                                >删除参数</el-button
-                            >
+                            <el-button type="danger" @click="removeRow(index, paramsIndex)">删除参数</el-button>
                         </template>
                     </div>
                     <div>
-                        <el-button
-                            style="margin-top: 5px"
-                            type="primary"
-                            @click="
-                                item.params.push({
-                                    param: '',
-                                    value: ''
-                                })
+                        <el-button style="margin-top: 5px" type="primary" @click="
+                            item.params.push({
+                                param: '',
+                                value: ''
+                            })
                             ">
-                            添加参数</el-button
-                        >
-                        <el-button
-                            style="margin-top: 5px"
-                            type="primary"
-                            @click="
-                                item.params.push({
-                                    param: '',
-                                    isCommon: true
-                                })
+                            添加参数</el-button>
+                        <el-button style="margin-top: 5px" type="primary" @click="
+                            item.params.push({
+                                param: '',
+                                isCommon: true
+                            })
                             ">
-                            添加通用参数</el-button
-                        >
+                            添加通用参数</el-button>
                     </div>
                 </li>
                 <li class="button_item">
-                    <el-button
-                        style="width: 100%"
-                        type="primary"
-                        @click="addSystem"
-                        >添加系统</el-button
-                    >
+                    <el-button style="width: 100%" type="primary" @click="addSystem">添加系统</el-button>
                 </li>
             </ul>
 
-            <span
-                slot="footer"
-                class="dialog-footer">
+            <span slot="footer" class="dialog-footer">
                 <el-button @click="cancelDeepParams">取 消</el-button>
-                <el-button
-                    type="primary"
-                    @click="comfirmDeepLink"
-                    >确 定</el-button
-                >
+                <el-button type="primary" @click="comfirmDeepLink">确 定</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import {serverIp} from '../../public/config'
+import { serverIp } from '../../public/config'
 
 export default {
     name: 'User',
@@ -723,7 +472,7 @@ export default {
                 // }
                 const deeplinklist = []
                 const depthLinkParam = JSON.parse(res.data.functionInfo.depthLinkParam)
-                console.log('depthLinkParam',depthLinkParam);
+                console.log('depthLinkParam', depthLinkParam);
                 depthLinkParam.forEach(item => {
                     let params
                     if (item.params.length) {
@@ -866,7 +615,7 @@ export default {
                 this.$message.error('系统已上限')
                 return
             }
-            this.deepLinkForm.params.push({system: '', params: [{param: '', value: ''}]})
+            this.deepLinkForm.params.push({ system: '', params: [{ param: '', value: '' }] })
         },
         //删除该系统
         deleteSystem(index) {
@@ -957,27 +706,34 @@ export default {
 .headerBg {
     background: #eee !important;
 }
+
 .el-table__header {
     width: 100% !important;
 }
+
 .el-table__body {
     width: 100% !important;
 }
+
 .deeplinkContent {
     list-style: none;
+
     .scheme_row {
         margin-bottom: 10px;
     }
+
     .input_item {
         border: 1px solid #ccc;
         padding: 5px;
         margin-bottom: 10px;
+
         .systemRow {
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
+
         .paramsRow {
             display: flex;
             align-items: center;
@@ -985,6 +741,7 @@ export default {
         }
     }
 }
+
 .deep-link-container {
     padding: 16px;
     background: #fff;
