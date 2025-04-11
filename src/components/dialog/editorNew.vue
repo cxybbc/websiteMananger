@@ -34,7 +34,7 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="新闻一级分类">
-                    <el-select v-model="parentGroupId" filterable placeholder="请选择">
+                    <el-select v-model="parentGroupId" filterable placeholder="请选择" @change="initChildGroup">
                         <el-option v-for="item in groupList" :key="item.id" :label="item.classificationName"
                             :value="item.id"> </el-option>
                     </el-select>
@@ -189,6 +189,11 @@
                             this.form.oldAppWebsiteIds = []
                             this.parentGroupId = ''
                             this.childGroupId = ''
+                            this.form.directory = [
+                                {
+                                    title: '',
+                                }
+                            ]
                         }
                     }
                 },
@@ -198,8 +203,12 @@
 
         methods: {
 
+            initChildGroup() {
 
-            addDirectory() {
+
+                this.childGroupId = ''
+            }
+            , addDirectory() {
                 console.log('res', this.form.directory);
                 this.form.directory.push({ title: '' })
             },
@@ -223,8 +232,9 @@
                     if (params.directory.length) {
                         params.directory = JSON.stringify(params.directory.map(item => item.title))
                     }
-                    if (this.parentGroupId) {
-                        params.classificationId = this.parentGroupId
+                    if (this.parentGroupId && !this.childGroupId && this.childGroupList.length) {
+                        this.$message.error('请选择二级分类')
+                        return
                     }
                     if (this.childGroupId) {
                         params.classificationId = this.childGroupId
