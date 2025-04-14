@@ -236,6 +236,9 @@
                         this.$message.error('请选择二级分类')
                         return
                     }
+                    if (this.parentGroupId) {
+                        params.classificationId = this.parentGroupId
+                    }
                     if (this.childGroupId) {
                         params.classificationId = this.childGroupId
                     }
