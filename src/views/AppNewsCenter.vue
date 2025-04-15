@@ -3,6 +3,8 @@
         <editorNew :isloading="detailLoading" :isShow="isShowEditorBox" :newDetailInfo="newDetailInfo"
             @refresh="hideDialog" :groupList="groupList" />
         <editorNewGroup :isShow="isShowGroupEditorBox" @refresh="hideGroupDialog" :groupList="groupList" />
+        <editorNewRight :isShow="isShowRitght" @refresh="hideRightDialog" />
+        <groupNewsList :isShow="isShowGroupNewsList" @refresh="hidGroupNewsList" :groupList="groupList" />
         <h1>新闻中心</h1>
         <header>
             <div class="selectBox">
@@ -24,6 +26,13 @@
                 </div>
                 <div class="searchbtn">
                     <el-button @click="addGroup">新增分类</el-button>
+                </div>
+
+                <div class="searchbtn">
+                    <el-button @click="addRight">版权申明</el-button>
+                </div>
+                <div class="searchbtn">
+                    <el-button @click="addNewsGroupList">新闻分类列表</el-button>
                 </div>
             </div>
             <el-button type="primary" @click="addNew">新增新闻</el-button>
@@ -82,6 +91,8 @@
     import request from '@/utils/request'
     import editorNew from '@/components/dialog/editorNew.vue'
     import editorNewGroup from '@/components/dialog/editorNewGroup.vue'
+    import editorNewRight from '@/components/dialog/editorNewRight.vue'
+    import groupNewsList from '@/components/dialog/groupNewsList.vue'
     import dayjs from 'dayjs'
     export default defineComponent({
         name: 'NewsCenter',
@@ -101,7 +112,9 @@
                 detailLoading: false,
                 serachWebId: null,
                 serachTitle: '',
-                groupList: []
+                groupList: [],
+                isShowRitght: false,
+                isShowGroupNewsList: false
             }
         },
 
@@ -114,6 +127,24 @@
         watch: {},
 
         methods: {
+            hidGroupNewsList() {
+                this.isShowGroupNewsList = false
+                this.getGroupList()
+            }
+            , addNewsGroupList() {
+                this.isShowGroupNewsList = true
+            },
+
+            hideRightDialog() {
+
+                this.isShowRitght = false
+            },
+
+            addRight() {
+                console.log('dianji');
+                this.isShowRitght = true
+                console.log('isShowRitght', this.isShowRitght);
+            },
             async getGroupList() {
                 try {
                     const res = await request.get('/newsClassification/list')
@@ -304,7 +335,7 @@
             this.getNewsList()
             this.getGroupList()
         },
-        components: { editorNew, editorNewGroup }
+        components: { editorNew, editorNewGroup, editorNewRight, groupNewsList }
     })
 </script>
 

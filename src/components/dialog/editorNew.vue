@@ -1,6 +1,6 @@
 <template>
     <div v-loading="isloading">
-        <el-dialog title="新闻编辑" :visible.sync="dialogVisible" width="50%" :before-close="closeDialog"
+        <el-dialog title="新闻编辑" :visible.sync="dialogVisible" width="30%" :before-close="closeDialog"
             :close-on-click-modal="false">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="已绑定其他应用站点">
@@ -48,7 +48,9 @@
                 <el-form-item label="浏览量">
                     <el-input-number v-model="form.views"></el-input-number>
                 </el-form-item>
-
+                <el-form-item label="版权声明">
+                    <el-input v-model="form.versionNotice"></el-input>
+                </el-form-item>
                 <el-form-item label="文章目录">
                     <p v-for="(item, index) in form.directory" :key="index">
                         <el-input v-model="item.title" placeholder="请输入目录"></el-input>
@@ -108,7 +110,8 @@
                     isTop: '', //是否指定置顶
                     classificationId: '', //分类id
                     views: '', //浏览量
-                    newsTime: '', //发布时间
+                    newsTime: '', //发布时间，
+                    versionNotice: '', //版权声明
                     directory: [
                         {
                             title: '',
@@ -220,6 +223,7 @@
                 }
             },
             closeDialog() {
+                this.currentId = ''
                 this.$emit('refresh')
             },
 
@@ -267,6 +271,7 @@
                             this.$message.error('新增失败')
                         }
                     }
+
                 } catch (err) {
                     console.log('失败', err)
                 }
