@@ -5,6 +5,8 @@
         <editorNewGroup :isShow="isShowGroupEditorBox" @refresh="hideGroupDialog" :groupList="groupList" />
         <editorNewRight :isShow="isShowRitght" @refresh="hideRightDialog" />
         <groupNewsList :isShow="isShowGroupNewsList" @refresh="hidGroupNewsList" :groupList="groupList" />
+        <manageGroup :isShow="isShowManageGroup" @refresh="hidManageGroup" @refresh2="getGroupList"
+            :groupList="groupList" />
         <h1>新闻中心</h1>
         <header>
             <div class="selectBox">
@@ -33,6 +35,9 @@
                 </div>
                 <div class="searchbtn">
                     <el-button @click="addNewsGroupList">新闻分类列表</el-button>
+                </div>
+                <div class="searchbtn">
+                    <el-button @click="managerGroup">分类管理</el-button>
                 </div>
             </div>
             <el-button type="primary" @click="addNew">新增新闻</el-button>
@@ -93,6 +98,7 @@
     import editorNewGroup from '@/components/dialog/editorNewGroup.vue'
     import editorNewRight from '@/components/dialog/editorNewRight.vue'
     import groupNewsList from '@/components/dialog/groupNewsList.vue'
+    import manageGroup from '@/components/dialog/manageGroup.vue'
     import dayjs from 'dayjs'
     export default defineComponent({
         name: 'NewsCenter',
@@ -114,7 +120,8 @@
                 serachTitle: '',
                 groupList: [],
                 isShowRitght: false,
-                isShowGroupNewsList: false
+                isShowGroupNewsList: false,
+                isShowManageGroup: false,
             }
         },
 
@@ -127,6 +134,13 @@
         watch: {},
 
         methods: {
+            hidManageGroup() {
+                this.isShowManageGroup = false
+                this.getGroupList()
+            },
+            managerGroup() {
+                this.isShowManageGroup = true
+            },
             hidGroupNewsList() {
                 this.isShowGroupNewsList = false
                 this.getGroupList()
@@ -335,7 +349,7 @@
             this.getNewsList()
             this.getGroupList()
         },
-        components: { editorNew, editorNewGroup, editorNewRight, groupNewsList }
+        components: { editorNew, editorNewGroup, editorNewRight, groupNewsList, manageGroup }
     })
 </script>
 
