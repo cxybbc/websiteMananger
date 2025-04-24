@@ -112,8 +112,6 @@
 
 
             async getNewsList() {
-
-
                 try {
                     const id = this.serachData.supClassificationId || this.serachData.classificationId
                     const res = await request.get('/news/findNews', {
