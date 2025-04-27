@@ -43,12 +43,12 @@
                         <el-option label="中文" value="zh"></el-option>
                         <el-option label="英文" value="en"></el-option>
                         <el-option label="西班牙语" value="es"></el-option>
-                        <el-option label="中文繁体" value="zh-Hant"></el-option>
+                        <el-option label="中文繁体" value="zhTW"></el-option>
                         <el-option label="日本語" value="ja"></el-option>
                         <el-option label="泰语" value="th"></el-option>
                         <el-option label="俄语" value="ru"></el-option>
-                        <el-option label="欧洲葡萄牙语" value="pt-PT"></el-option>
-                        <el-option label="巴西葡萄牙语" value="pt-BR"></el-option>
+                        <el-option label="欧洲葡萄牙语" value="ptPT"></el-option>
+                        <el-option label="巴西葡萄牙语" value="ptBR"></el-option>
                     </el-select>
                     <el-input v-model="item.content" style="flex: 2" placeholder="请输入内容" />
                     <el-button type="danger" @click="removeRow(index)">删除</el-button>
