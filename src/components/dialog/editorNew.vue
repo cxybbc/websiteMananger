@@ -17,6 +17,9 @@
                 <el-form-item label="新闻标题">
                     <el-input v-model="form.title" placeholder="请输入新闻标题"></el-input>
                 </el-form-item>
+                <el-form-item label="新闻描述">
+                    <el-input v-model="form.description" placeholder="请输入新闻描述"></el-input>
+                </el-form-item>
                 <el-form-item label="是否置顶">
                     <el-radio-group v-model="form.isTop">
                         <el-radio :label="1">是</el-radio>
@@ -112,6 +115,7 @@
                     views: '', //浏览量
                     newsTime: '', //发布时间，
                     versionNotice: '', //版权声明
+                    description: '',//新闻描述
                     directory: [
                         {
                             title: '',

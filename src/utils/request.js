@@ -3,7 +3,7 @@ import ElementUI from "element-ui";
 import router from "@/router/index.js";
 const request = axios.create({
     baseURL: 'https://websitemanage.biggerlens.cn:18060'
-    //baseURL: 'http://192.168.31.36:18061'
+    // baseURL: 'http://192.168.31.36:18061'
 })
 
 // request 拦截器

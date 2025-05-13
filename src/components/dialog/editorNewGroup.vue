@@ -13,7 +13,12 @@
 
                     </el-radio-group>
                 </el-form-item>
-
+                <el-form-item label="应用官网">
+                    <el-select v-model="form.appWebsiteId" filterable placeholder="请选择">
+                        <el-option v-for="item in websiteList" :key="item.id" :label="item.webSiteName"
+                            :value="item.id"> </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="一级分类" v-if="type == 2">
                     <el-select v-model="form.supClassificationId" filterable placeholder="请选择">
                         <el-option v-for="item in groupList" :key="item.id" :label="item.classificationName"
@@ -23,8 +28,28 @@
                 <el-form-item label="分类名称" prop="classificationName">
                     <el-input v-model="form.classificationName" placeholder="请输入内容"></el-input>
                 </el-form-item>
-                <el-form-item label="分类图标" prop="classificationAvaurl">
+                <!-- <el-form-item label="分类国际化" prop="language">
+                    <el-select v-model="form.language" filterable placeholder="请选择语言标识">
+                        <el-option label="中文" value="zh"></el-option>
+                        <el-option label="英文" value="en"></el-option>
+                        <el-option label="西班牙语" value="es"></el-option>
+                        <el-option label="中文繁体" value="zhTW"></el-option>
+                        <el-option label="日本語" value="ja"></el-option>
+                        <el-option label="泰语" value="th"></el-option>
+                        <el-option label="俄语" value="ru"></el-option>
+                        <el-option label="欧洲葡萄牙语" value="ptPT"></el-option>
+                        <el-option label="巴西葡萄牙语" value="ptBR"></el-option>
+                    </el-select>
+                </el-form-item> -->
+
+
+                <el-form-item label="未激活图标" prop="classificationAvaurl">
                     <el-upload class="upload-demo" action="#" :on-change="handlePreview" :auto-upload="false">
+                        <el-button size="small" type="primary">点击上传</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="激活图标" prop="activationClassificationAvaurl">
+                    <el-upload class="upload-demo" action="#" :on-change="handleUnactive" :auto-upload="false">
                         <el-button size="small" type="primary">点击上传</el-button>
                     </el-upload>
                 </el-form-item>
@@ -58,8 +83,11 @@
 
                     classificationName: '',
                     classificationAvaurl: '',
+                    activationClassificationAvaurl: '',
                     supClassificationId: '',
-                    supClassificationName: ''
+                    supClassificationName: '',
+                    // language: '',
+                    appWebsiteId: ''
                 },
 
             }
@@ -130,6 +158,11 @@
             },
             async handlePreview(file) {
                 this.form.classificationAvaurl = await this.fileToBase64(file.raw).then((res) => {
+                    return res;
+                });
+            },
+            async handleUnactive(file) {
+                this.form.activationClassificationAvaurl = await this.fileToBase64(file.raw).then((res) => {
                     return res;
                 });
             },
