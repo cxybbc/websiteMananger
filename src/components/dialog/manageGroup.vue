@@ -24,10 +24,11 @@
                 <el-form-item label="分类列表" v-if="groupListC.length">
 
                     <ul class="groupList">
-                        <li v-for="(item, index) in groupListC" :key="index">
-                            <el-input style="width: 190px;" v-model="item.classificationName"></el-input>
+                        <li v-for="(item, index) in groupListC" :key="index" style="margin-bottom:10px">
+                            <el-input style="width: 190px;margin-right:10px"
+                                v-model="item.classificationName"></el-input>
                             <el-button type="primary" @click="updateName(item)">确定</el-button>
-
+                            <el-button type="danger" @click="deleteGroup(item)">删除</el-button>
                         </li>
                     </ul>
                 </el-form-item>
@@ -89,6 +90,15 @@
                 if (newVal) {
                     this.groupListC = JSON.parse(JSON.stringify(this.groupList))
                 }
+            },
+            groupList: {
+                handler(newVal, oldVal) {
+                    console.log('groupList', newVal);
+                    if (newVal.length) {
+                        this.groupListC = JSON.parse(JSON.stringify(newVal))
+                    }
+                },
+                deep: true
             }
         },
 
@@ -124,12 +134,35 @@
                             type: 'success'
                         })
                         this.$emit('refresh2')
+
+
                     } else {
                         this.$message({
                             message: '修改失败',
                             type: 'error'
                         })
                     }
+                } catch (err) {
+                    console.log('err', err);
+                }
+            },
+            async deleteGroup(item) {
+                try {
+                    const res = await request.post(`/newsClassification/del/${item.id}`)
+                    console.log('res', res);
+                    if (res.code == 200) {
+                        this.$message({
+                            message: '修改成功',
+                            type: 'success'
+                        })
+                        this.$emit('refresh2')
+                    } else {
+                        this.$message({
+                            message: '修改失败',
+                            type: 'error'
+                        })
+                    }
+
                 } catch (err) {
                     console.log('err', err);
                 }
