@@ -17,6 +17,9 @@
                 <el-form-item label="新闻标题">
                     <el-input v-model="form.title" placeholder="请输入新闻标题"></el-input>
                 </el-form-item>
+                <el-form-item label="新闻路由地址">
+                    <el-input v-model="form.textMeaning" placeholder="请输入新闻路由地址"></el-input>
+                </el-form-item>
                 <el-form-item label="新闻描述">
                     <el-input v-model="form.description" placeholder="请输入新闻描述"></el-input>
                 </el-form-item>
@@ -108,6 +111,7 @@
                     appWebsiteIds: [], //应用站点
                     oldAppWebsiteIds: [], //应用站点
                     title: '', //标题
+                    textMeaning: '', //新闻路由地址
                     text: '', //新闻内容
                     cover: '', //封面图
                     isTop: '', //是否指定置顶
@@ -234,6 +238,10 @@
             async uploadNewInfo() {
                 try {
                     const params = JSON.parse(JSON.stringify(this.form))
+                    if (!params.textMeaning) {
+                        this.$message.error('请输入新闻路由地址')
+                        return
+                    }
                     if (params.newsTime) {
                         params.newsTime = dayjs(params.newsTime).format('YYYY-MM-DD HH:mm:ss')
                     }
@@ -258,7 +266,7 @@
                             this.$message.success('修改成功')
                             this.closeDialog()
                         } else {
-                            this.$message.error('修改失败')
+                            this.$message.error(res.msg)
                         }
                     } else {
                         delete params.id
@@ -272,7 +280,7 @@
                             this.$message.success('新增成功')
                             this.closeDialog()
                         } else {
-                            this.$message.error('新增失败')
+                            this.$message.error(res.msg)
                         }
                     }
 
