@@ -20,6 +20,12 @@
                 <el-form-item label="新闻路由地址">
                     <el-input v-model="form.textMeaning" placeholder="请输入新闻路由地址"></el-input>
                 </el-form-item>
+                <el-form-item label="网页标题">
+                    <el-input v-model="form.pageTitle" placeholder="请输入网页标题"></el-input>
+                </el-form-item>
+                <el-form-item label="网页描述">
+                    <el-input v-model="form.metaDescription" placeholder="请输入网页meta描述"></el-input>
+                </el-form-item>
                 <el-form-item label="新闻描述">
                     <el-input v-model="form.description" placeholder="请输入新闻描述"></el-input>
                 </el-form-item>
@@ -120,6 +126,8 @@
                     newsTime: '', //发布时间，
                     versionNotice: '', //版权声明
                     description: '',//新闻描述
+                    pageTitle: '', //网页标题(title)
+                    metaDescription: '', //网页meta描述
                     directory: [
                         {
                             title: '',
