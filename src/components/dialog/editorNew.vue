@@ -26,6 +26,9 @@
                 <el-form-item label="网页描述">
                     <el-input v-model="form.metaDescription" placeholder="请输入网页meta描述"></el-input>
                 </el-form-item>
+                <el-form-item label="结构化数据">
+                    <el-input type="textarea" autosize v-model="form.jsonStr" placeholder="请输入网页结构化数据"></el-input>
+                </el-form-item>
                 <el-form-item label="新闻描述">
                     <el-input v-model="form.description" placeholder="请输入新闻描述"></el-input>
                 </el-form-item>
@@ -128,6 +131,26 @@
                     description: '',//新闻描述
                     pageTitle: '', //网页标题(title)
                     metaDescription: '', //网页meta描述
+                    jsonStr: `{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": ""
+  },
+  "headline": "",
+  "description": "",
+  "keywords": "",
+  "image": "",
+  "author": {
+    "@type": "Person",
+    "name": ""
+  },
+  "datePublished": "",
+  "dateModified": ""
+}
+
+                    `, //网页meta关键词
                     directory: [
                         {
                             title: '',
@@ -199,6 +222,24 @@
                             }
                             else {
                                 this.form[key] = copyData[key]
+                                this.form.jsonStr = copyData.jsonStr ? copyData.jsonStr : ` {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": ""
+  },
+  "headline": "",
+  "description": "",
+  "keywords": "",
+  "image": "",
+  "author": {
+    "@type": "Person",
+    "name": ""
+  },
+  "datePublished": "",
+  "dateModified": ""
+}`
                             }
                         }
                     } else {
