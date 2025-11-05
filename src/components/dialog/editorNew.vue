@@ -222,7 +222,7 @@
                             }
                             else {
                                 this.form[key] = copyData[key]
-                                this.form.jsonStr = copyData.jsonStr ? copyData.jsonStr : ` {
+                                this.form.jsonStr = copyData.jsonStr ? copyData.jsonStr : `{
   "@context": "https://schema.org",
   "@type": "Article",
   "mainEntityOfPage": {
