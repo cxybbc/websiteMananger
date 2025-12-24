@@ -180,7 +180,9 @@
                 this.isShowGroupEditorBox = false
                 this.getGroupList()
             },
-
+            rerfelshGroupList() {
+                this.getGroupList()
+            },
 
             reset() {
                 this.getNewsList()
