@@ -1,80 +1,29 @@
 <template>
     <div>
-        <el-dialog
-            title="编辑深度链接"
-            :visible.sync="dialogVisible"
-            :before-close="handleClose"
-            width="40%">
-            <el-form
-                ref="form"
-                :model="form"
-                label-width="110px"
-                :label-position="'left'">
-                <el-form-item
-                    label="官网"
-                    prop="appId">
-                    <el-select
-                        v-model="form.appId"
-                        placeholder="请选择官网"
-                        filterable
-                        clearable>
-                        <el-option
-                            v-for="item in appList"
-                            :key="item.id"
-                            :label="item.webSiteName"
-                            :value="item.id"></el-option></el-select
-                ></el-form-item>
-                <el-form-item
-                    label="深度链接名称"
-                    prop="deepLinkName">
-                    <el-input
-                        v-model="form.deepLinkName"
-                        placeholder="请输入深度链接名称"></el-input>
+        <el-dialog title="编辑深度链接" :visible.sync="dialogVisible" :before-close="handleClose" width="40%">
+            <el-form ref="form" :model="form" label-width="110px" :label-position="'left'">
+                <el-form-item label="官网" prop="appId">
+                    <el-select v-model="form.appId" placeholder="请选择官网" filterable clearable>
+                        <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
+                            :value="item.id"></el-option></el-select></el-form-item>
+                <el-form-item label="深度链接名称" prop="deepLinkName">
+                    <el-input v-model="form.deepLinkName" placeholder="请输入深度链接名称"></el-input>
                 </el-form-item>
-                <el-form-item
-                    label="iOS深度链接"
-                    prop="deepLink">
-                    <el-input
-                        disabled
-                        v-model="form.iOSDeepLink"
-                        placeholder="深度链接"></el-input>
-                    <el-button
-                        style="margin-top: 5px"
-                        type="primary"
-                        @click="goAddDeepLink('ios')"
-                        >编辑</el-button
-                    >
+                <el-form-item label="iOS深度链接" prop="deepLink">
+                    <el-input disabled v-model="form.iOSDeepLink" placeholder="深度链接"></el-input>
+                    <el-button style="margin-top: 5px" type="primary" @click="goAddDeepLink('ios')">编辑</el-button>
                 </el-form-item>
-                <el-form-item
-                    label="Android深度链接"
-                    prop="deepLink">
-                    <el-input
-                        disabled
-                        v-model="form.AndroidDeepLink"
-                        placeholder="深度链接"></el-input>
-                    <el-button
-                        style="margin-top: 5px"
-                        type="primary"
-                        @click="goAddDeepLink('android')"
-                        >编辑</el-button
-                    >
+                <el-form-item label="Android深度链接" prop="deepLink">
+                    <el-input disabled v-model="form.AndroidDeepLink" placeholder="深度链接"></el-input>
+                    <el-button style="margin-top: 5px" type="primary" @click="goAddDeepLink('android')">编辑</el-button>
                 </el-form-item>
                 <el-form-item label="备注">
-                    <el-input
-                        v-model="form.remark"
-                        type="textarea"
-                        placeholder="请输入备注"></el-input>
+                    <el-input v-model="form.remark" type="textarea" placeholder="请输入备注"></el-input>
                 </el-form-item>
             </el-form>
-            <span
-                slot="footer"
-                class="dialog-footer">
+            <span slot="footer" class="dialog-footer">
                 <el-button @click="handleClose">取 消</el-button>
-                <el-button
-                    type="primary"
-                    @click="comfirm"
-                    >确 定</el-button
-                >
+                <el-button type="primary" @click="comfirm">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -155,20 +104,20 @@ export default {
                 if (this.form.iOSDeepLink) {
                     this.deepLinkList = this.form.iOSDeepLink.split('?')[1]
                         ? this.form.iOSDeepLink
-                              .split('?')[1]
-                              .split('&')
-                              .map(item => {
-                                  return {
-                                      deepParamName: item.split('=')[0],
-                                      deepParamValue: item.split('=')[1]
-                                  }
-                              })
+                            .split('?')[1]
+                            .split('&')
+                            .map(item => {
+                                return {
+                                    deepParamName: item.split('=')[0],
+                                    deepParamValue: item.split('=')[1]
+                                }
+                            })
                         : [
-                              {
-                                  deepParamName: '',
-                                  deepParamValue: ''
-                              }
-                          ]
+                            {
+                                deepParamName: '',
+                                deepParamValue: ''
+                            }
+                        ]
                     this.scheme = this.form.iOSDeepLink.split('?')[0]
                 } else {
                     this.deepLinkList = [
@@ -183,19 +132,19 @@ export default {
                 if (this.form.AndroidDeepLink) {
                     this.deepLinkList = this.form.AndroidDeepLink.split('?')[1]
                         ? this.form.AndroidDeepLink.split('?')[1]
-                              .split('&')
-                              .map(item => {
-                                  return {
-                                      deepParamName: item.split('=')[0],
-                                      deepParamValue: item.split('=')[1]
-                                  }
-                              })
+                            .split('&')
+                            .map(item => {
+                                return {
+                                    deepParamName: item.split('=')[0],
+                                    deepParamValue: item.split('=')[1]
+                                }
+                            })
                         : [
-                              {
-                                  deepParamName: '',
-                                  deepParamValue: ''
-                              }
-                          ]
+                            {
+                                deepParamName: '',
+                                deepParamValue: ''
+                            }
+                        ]
                     this.scheme = this.form.AndroidDeepLink.split('?')[0]
                 } else {
                     this.deepLinkList = [
@@ -246,9 +195,11 @@ export default {
 <style lang="less" scoped>
 .deeplinkContent {
     list-style: none;
+
     .scheme_row {
         margin-bottom: 10px;
     }
+
     .input_item {
         display: flex;
         align-items: center;

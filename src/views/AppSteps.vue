@@ -15,22 +15,16 @@
             :header-cell-class-name="'headerBg'">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="id" label="编号" width="150" align="center"></el-table-column>
-            <el-table-column prop="stepsHTitle" label="教程步骤主标题" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column prop="stepsTitle" label="教程步骤标题" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column prop="stepsText" label="教程步骤文本" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column prop="stepsIndex" label="教程步骤序号" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column prop="infoContent" label="教程步骤详情" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column prop="pointTitle" label="布局点" width="150" align="center"
-                :show-overflow-tooltip="true"></el-table-column>
+            <el-table-column prop="stepsHTitle" label="教程步骤主标题" width="150" align="center"></el-table-column>
+            <el-table-column prop="stepsTitle" label="教程步骤标题" width="150" align="center"></el-table-column>
+            <el-table-column prop="stepsText" label="教程步骤文本" width="150" align="center"></el-table-column>
+            <el-table-column prop="stepsIndex" label="教程步骤序号" width="150" align="center"></el-table-column>
+            <el-table-column prop="infoContent" label="教程步骤详情" width="150" align="center"></el-table-column>
+            <el-table-column prop="pointTitle" label="布局点" width="150" align="center"></el-table-column>
             <el-table-column prop="stepsAvaurl" label="详情图" width="150" align="center">
                 <template slot-scope="scope">
                     <img v-if="scope.row.stepsAvaurl" :src="'//' + scope.row.stepsAvaurl" alt=""
-                        style="width: 100px; height: 150px" />
+                        style="width: 50px; height: 50px" />
                     <el-progress v-if="!uploadData && scope.row.id == currentId"
                         :percentage="uploadProgress"></el-progress>
                 </template>
@@ -483,7 +477,11 @@ export default {
                             this.$message.success('保存成功')
                             this.dialogFormVisible = false
                             this.$refs.upload.clearFiles()
-                            this.load()
+                            if (this.username) {
+                                this.search()
+                            } else {
+                                this.load()
+                            }
                             this.form = {}
                             this.base64Img = ''
                             this.image = ''
@@ -514,7 +512,11 @@ export default {
                             this.$message.success('保存成功')
                             this.dialogFormVisible1 = false
                             this.$refs.upload.clearFiles()
-                            this.load()
+                            if (this.username) {
+                                this.search()
+                            } else {
+                                this.load()
+                            }
                             this.form = {}
                             this.base64Img = ''
                             this.image = ''

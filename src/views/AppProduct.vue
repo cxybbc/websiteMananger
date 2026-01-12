@@ -1,13 +1,15 @@
 <template>
     <div>
         <!-- AppProduct.vue template 新增产品分类/编辑 弹窗 -->
-        <el-dialog title="新增/编辑产品分类" :visible.sync="isProductCategory" width="50%" height="400px" :close-on-click-modal="false" :close-on-press-escape="false">
+        <el-dialog title="新增/编辑产品分类" :visible.sync="isProductCategory" width="50%" height="400px"
+            :close-on-click-modal="false" :close-on-press-escape="false">
             <div class="content">
                 <!-- 表单内容 -->
                 <el-form :model="productSetform" :rules="productSetformRules" ref="formRef" label-width="100px">
                     <el-form-item label="所属官网" prop="website">
                         <el-select v-model="productSetform.website" placeholder="请选择">
-                            <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName" :value="item.id"></el-option>
+                            <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
+                                :value="item.id"></el-option>
                         </el-select>
                     </el-form-item>
 
@@ -20,7 +22,8 @@
                     </el-form-item>
 
                     <el-form-item label="国际化" prop="localization">
-                        <el-input :disabled="true" v-model="productSetform.localization" placeholder='例如：{ "en": "Hot recommended" }' />
+                        <el-input :disabled="true" v-model="productSetform.localization"
+                            placeholder='例如：{ "en": "Hot recommended" }' />
                         <el-button type="primary" @click="handleEdit('productCategoryEdit')">编辑</el-button>
                     </el-form-item>
                 </el-form>
@@ -32,12 +35,20 @@
         </el-dialog>
 
         <!-- 分类名称 国际化 -->
-        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :title="productTitle" :visible.sync="isProductCateEditDialog" width="50%" height="400px">
+        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :title="productTitle"
+            :visible.sync="isProductCateEditDialog" width="50%" height="400px">
             <div class="content" style="display: flex; flex-direction: column; gap: 10px">
                 <div v-for="(item, index) in Localizationfrom" style="display: flex; gap: 10px" :key="index">
                     <el-select style="flex: 1" v-model="item.language" placeholder="请选择语言">
                         <el-option label="中文" value="zh"></el-option>
                         <el-option label="英文" value="en"></el-option>
+                        <el-option label="西班牙语" value="es"></el-option>
+                        <el-option label="中文繁体" value="zhTW"></el-option>
+                        <el-option label="日本語" value="ja"></el-option>
+                        <el-option label="泰语" value="th"></el-option>
+                        <el-option label="俄语" value="ru"></el-option>
+                        <el-option label="欧洲葡萄牙语" value="ptPT"></el-option>
+                        <el-option label="巴西葡萄牙语" value="ptBR"></el-option>
                     </el-select>
                     <el-input v-model="item.content" style="flex: 2" placeholder="请输入内容" />
                     <el-button type="danger" @click="removeRow(index)">删除</el-button>
@@ -53,7 +64,8 @@
         </el-dialog>
 
         <!-- 下载渠道编辑弹窗 -->
-        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="编辑下载渠道" :visible.sync="isProductMiddleDowndialog" width="50%" height="400px">
+        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="编辑下载渠道"
+            :visible.sync="isProductMiddleDowndialog" width="50%" height="400px">
             <div class="content" style="display: flex; flex-direction: column; gap: 10px">
                 <div v-for="(item, index) in downloadfrom" style="display: flex; gap: 10px" :key="index">
                     <el-select style="flex: 1" v-model="item.downloadType" placeholder="请选择渠道">
@@ -79,7 +91,8 @@
         </el-dialog>
 
         <!-- 产品中台 新增编辑 -->
-        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="新增/编辑产品" :visible.sync="productappcenter" width="50%" height="400px">
+        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="新增/编辑产品"
+            :visible.sync="productappcenter" width="50%" height="400px">
             <div class="productapp_content" style="min-height: 500px">
                 <el-form ref="productForm" :model="productMiddleSetform" :rules="productMiddleSetformRules">
                     <!-- 产品名称 -->
@@ -89,7 +102,8 @@
 
                     <!-- 名称国际化 -->
                     <el-form-item label="名称国际化" prop="internationalName" class="form-item">
-                        <el-input :disabled="true" style="width: 40vh" v-model="productMiddleSetform.internationalName" />
+                        <el-input :disabled="true" style="width: 40vh"
+                            v-model="productMiddleSetform.internationalName" />
                         <el-button type="primary" @click="handleEdit('productNameEdit')">编辑</el-button>
                     </el-form-item>
 
@@ -100,7 +114,8 @@
 
                     <!-- 简介国际化 -->
                     <el-form-item label="简介国际化" prop="internationalInfo">
-                        <el-input :disabled="true" style="width: 40vh" v-model="productMiddleSetform.internationalInfo" />
+                        <el-input :disabled="true" style="width: 40vh"
+                            v-model="productMiddleSetform.internationalInfo" />
                         <el-button type="primary" @click="handleEdit('productDetailEdit')">编辑</el-button>
                     </el-form-item>
 
@@ -108,8 +123,10 @@
                     <el-form-item label="产品LOGO" prop="logo">
                         <!-- :file-list="logoList"  -->
                         <el-input v-if="middlelogobase64" v-model="middlelogobase64" width="300px" />
-                        <el-upload ref="upload" action="action" :show-file-list="false" :on-change="handleuploadLogo" :on-remove="handleuploadLogoRemove" :limit="1" :auto-upload="false">
-                            <el-button size="small" :type="middlelogobase64 ? 'danger' : 'primary'" @click="handleReplaceClick">
+                        <el-upload ref="upload" action="action" :show-file-list="false" :on-change="handleuploadLogo"
+                            :on-remove="handleuploadLogoRemove" :limit="1" :auto-upload="false">
+                            <el-button size="small" :type="middlelogobase64 ? 'danger' : 'primary'"
+                                @click="handleReplaceClick">
                                 {{ middlelogobase64 ? '替换图片' : '上传图片' }}
                             </el-button>
                         </el-upload>
@@ -127,7 +144,8 @@
                     </el-form-item>
 
                     <el-form-item label="官网链接">
-                        <el-input :disabled="true" style="width: 40vh" v-model="productMiddleSetform.websiteUrl"></el-input>
+                        <el-input :disabled="true" style="width: 40vh"
+                            v-model="productMiddleSetform.websiteUrl"></el-input>
                         <el-button type="primary" @click="handleEdit('productWebsiteEdit')">编辑</el-button>
                     </el-form-item>
 
@@ -135,16 +153,20 @@
                     <el-form-item label="UI背景图">
                         <!-- :file-list="bgList"  -->
                         <el-input v-if="middlebackgroupbase64" v-model="middlebackgroupbase64" width="300px" />
-                        <el-upload ref="upload2" action="action" :show-file-list="false" :on-change="handleuploadBg" :limit="1" :auto-upload="false">
-                            <el-button size="small" :type="middlebackgroupbase64 ? 'danger' : 'primary'" @click="handleReplaceClick2">
+                        <el-upload ref="upload2" action="action" :show-file-list="false" :on-change="handleuploadBg"
+                            :limit="1" :auto-upload="false">
+                            <el-button size="small" :type="middlebackgroupbase64 ? 'danger' : 'primary'"
+                                @click="handleReplaceClick2">
                                 {{ middlebackgroupbase64 ? '替换图片' : '上传图片' }}
                             </el-button>
                         </el-upload>
                     </el-form-item>
                     <el-form-item label="移动端UI背景图">
                         <el-input v-if="middleMbackgroupbase64" v-model="middleMbackgroupbase64" width="300px" />
-                        <el-upload ref="upload3" :show-file-list="false" action="action" :on-change="handleuploadMBg" :on-remove="handleuploadMBgRemove" :limit="1" :auto-upload="false">
-                            <el-button size="small" :type="middleMbackgroupbase64 ? 'danger' : 'primary'" @click="handleReplaceClick3">
+                        <el-upload ref="upload3" :show-file-list="false" action="action" :on-change="handleuploadMBg"
+                            :on-remove="handleuploadMBgRemove" :limit="1" :auto-upload="false">
+                            <el-button size="small" :type="middleMbackgroupbase64 ? 'danger' : 'primary'"
+                                @click="handleReplaceClick3">
                                 {{ middleMbackgroupbase64 ? '替换图片' : '上传图片' }}
                             </el-button>
                         </el-upload>
@@ -158,17 +180,20 @@
         </el-dialog>
 
         <!-- 推荐产品分类 -->
-        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="推荐产品分类" :visible.sync="isproductPreview" width="80%">
+        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="推荐产品分类"
+            :visible.sync="isproductPreview" width="80%">
             <div class="preview_content" style="height: 500px; overflow-y: auto">
                 <div v-if="assortList.length === 0" class="empty-message">
                     <p style="text-align: center">没有数据可显示,需进行分配</p>
                 </div>
                 <draggable v-model="assortList" @end="onDragEnd" :animation="200" ghost-class="dragging">
-                    <div v-for="(item, index) in assortList" :key="index" class="item-card" style="position: relative; width: 100px; text-align: center; margin: 10px; display: inline-block">
+                    <div v-for="(item, index) in assortList" :key="index" class="item-card"
+                        style="position: relative; width: 100px; text-align: center; margin: 10px; display: inline-block">
                         <!-- 勾选框 -->
                         <el-checkbox v-model="item.selected" style="position: absolute; top: 5px; right: 5px" />
                         <!-- 图片 -->
-                        <img :src="'//' + item.logo" :alt="item.name" style="width: 100px; height: 100px; border-radius: 5px" />
+                        <img :src="'//' + item.logo" :alt="item.name"
+                            style="width: 100px; height: 100px; border-radius: 5px" />
                         <!-- 名称 -->
                         <div style="margin-top: 5px">{{ item.name }}</div>
                     </div>
@@ -185,16 +210,20 @@
 
         <!-- 推荐产品分类产品中台 -->
 
-        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="推荐产品分类" :visible.sync="isproductPreviewcenter" width="80%">
+        <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" title="推荐产品分类"
+            :visible.sync="isproductPreviewcenter" width="80%">
             <div class="preview_content" style="height: 500px">
-                <el-table :key="3" ref="table" stripe :header-cell-class-name="'headerBg'" style="width: 100%" maxHeight="500px" :data="rationList" :selection.sync="selectedRows" @selection-change="handleSelectionChange">
+                <el-table :key="3" ref="table" stripe :header-cell-class-name="'headerBg'" style="width: 100%"
+                    maxHeight="500px" :data="rationList" :selection.sync="selectedRows"
+                    @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column prop="sortIndex" label="序号" width="80"></el-table-column>
                     <el-table-column prop="name" label="产品名称" width="180"></el-table-column>
                     <el-table-column prop="info" label="产品简介"></el-table-column>
                     <el-table-column prop="logo" label="产品LOGO">
                         <template v-slot="scope">
-                            <img :src="'//' + scope.row.logo" style="width: 30px; height: 30px; border-radius: 5px" alt="" />
+                            <img :src="'//' + scope.row.logo" style="width: 30px; height: 30px; border-radius: 5px"
+                                alt="" />
                         </template>
                     </el-table-column>
                     <el-table-column prop="download" label="下载渠道"></el-table-column>
@@ -211,7 +240,8 @@
             <div class="header">
                 <div class="product_selectbox">
                     <el-select placeholder="请选择官网" v-model="WEB_ID" style="height: 60px">
-                        <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName" :value="item.id"></el-option>
+                        <el-option v-for="item in appList" :key="item.id" :label="item.webSiteName"
+                            :value="item.id"></el-option>
                     </el-select>
 
                     <el-button type="primary" style="height: 30px" @click="searchProductCategory()">搜索</el-button>
@@ -225,10 +255,12 @@
             </div>
 
             <div class="main">
-                <el-table :data="tableData" border :key="1" stripe :header-cell-class-name="'headerBg'" style="width: 100%">
+                <el-table :data="tableData" border :key="1" stripe :header-cell-class-name="'headerBg'"
+                    style="width: 100%">
                     <el-table-column prop="appWebsiteId" label="所属官网" width="180">
                         <template v-slot="scope">
-                            <el-tooltip class="item" effect="dark" :content="getWebsiteName(scope.row.appWebsiteId)" placement="top">
+                            <el-tooltip class="item" effect="dark" :content="getWebsiteName(scope.row.appWebsiteId)"
+                                placement="top">
                                 <span>{{ getWebsiteName(scope.row.appWebsiteId) }}</span>
                             </el-tooltip>
                         </template>
@@ -253,7 +285,9 @@
             </div>
 
             <div style="padding: 10px 0">
-                <el-pagination @current-change="handleChangePage" :page-sizes="[5, 10, 15, 20, 25]" :page-size="pageSize" :current-page="pageNum" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
+                <el-pagination @current-change="handleChangePage" :page-sizes="[5, 10, 15, 20, 25]"
+                    :page-size="pageSize" :current-page="pageNum" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total"> </el-pagination>
             </div>
         </div>
 
@@ -263,8 +297,10 @@
                 <span class="title">产品中台</span>
                 <div class="product_selectbox">
                     <el-input placeholder="请选择产品名称" v-model="middleAppTitle"></el-input>
-                    <el-button type="primary" style="height: 30px; margin-left: 10px" @click="searchProductCenter()">搜索</el-button>
-                    <el-button type="warning" style="height: 30px; margin-left: 10px" @click="handleCenterreset()">重置</el-button>
+                    <el-button type="primary" style="height: 30px; margin-left: 10px"
+                        @click="searchProductCenter()">搜索</el-button>
+                    <el-button type="warning" style="height: 30px; margin-left: 10px"
+                        @click="handleCenterreset()">重置</el-button>
                 </div>
 
                 <div class="setbox">
@@ -279,20 +315,25 @@
                     <el-table-column prop="info" label="产品简介"></el-table-column>
                     <el-table-column prop="logo" label="产品LOGO">
                         <template v-slot="scope">
-                            <img :src="'//' + scope.row.logo" alt="产品LOGO" style="width: 38px; height: 38px; border-radius: 5px" v-if="scope.row.logo" />
+                            <img :src="'//' + scope.row.logo" alt="产品LOGO"
+                                style="width: 38px; height: 38px; border-radius: 5px" v-if="scope.row.logo" />
                         </template>
                     </el-table-column>
                     <el-table-column label="web端UI背景">
                         <template v-slot="scope">
-                            <img :src="'//' + scope.row.uiBackGround" alt="产品LOGO" style="width: 38px; height: 38px; border-radius: 5px" v-if="scope.row.uiBackGround" />
+                            <img :src="'//' + scope.row.uiBackGround" alt="产品LOGO"
+                                style="width: 38px; height: 38px; border-radius: 5px" v-if="scope.row.uiBackGround" />
                         </template>
                     </el-table-column>
                     <el-table-column label="移动端UI背景">
                         <template v-slot="scope">
-                            <img :src="'//' + scope.row.uiBackGroundMobile" alt="产品LOGO" style="width: 38px; height: 38px; border-radius: 5px" v-if="scope.row.uiBackGroundMobile" />
+                            <img :src="'//' + scope.row.uiBackGroundMobile" alt="产品LOGO"
+                                style="width: 38px; height: 38px; border-radius: 5px"
+                                v-if="scope.row.uiBackGroundMobile" />
                         </template>
                     </el-table-column>
-                    <el-table-column prop="download" :style="{ height: '60px', overflow: 'hidden' }" label="下载渠道"></el-table-column>
+                    <el-table-column prop="download" :style="{ height: '60px', overflow: 'hidden' }"
+                        label="下载渠道"></el-table-column>
                     <el-table-column prop="actions" label="操作" width="280">
                         <template v-slot="scope">
                             <el-button type="primary" @click="handleProductcenteradd('edit', scope.row)">编辑</el-button>
@@ -303,7 +344,9 @@
             </div>
 
             <div style="padding: 10px 0">
-                <el-pagination @current-change="handleChangePageCentet" :page-sizes="[5, 10, 15, 20, 25]" :page-size="centerpageSize" :current-page="centerpageNum" layout="total, sizes, prev, pager, next, jumper" :total="totals"> </el-pagination>
+                <el-pagination @current-change="handleChangePageCentet" :page-sizes="[5, 10, 15, 20, 25]"
+                    :page-size="centerpageSize" :current-page="centerpageNum"
+                    layout="total, sizes, prev, pager, next, jumper" :total="totals"> </el-pagination>
             </div>
         </div>
     </div>
@@ -1159,11 +1202,14 @@ export default {
     box-sizing: border-box;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap; /* 避免换行 */
-    line-height: 60px; /* 设置行高 */
+    white-space: nowrap;
+    /* 避免换行 */
+    line-height: 60px;
+    /* 设置行高 */
     padding-left: 10px;
     padding-right: 10px;
-    height: 60px !important; /* 确保行高固定 */
+    height: 60px !important;
+    /* 确保行高固定 */
 }
 
 .fixed-row-height {
@@ -1176,20 +1222,25 @@ export default {
 
 /* 控制 el-form-item 的布局 */
 .productapp_content .el-form-item {
-    display: flex; /* 使用 flexbox 来实现内联布局 */
-    align-items: center; /* 使表单项的内容垂直居中 */
+    display: flex;
+    /* 使用 flexbox 来实现内联布局 */
+    align-items: center;
+    /* 使表单项的内容垂直居中 */
 }
 
 /* 固定 label 宽度 */
 .productapp_content .el-form-item .el-form-item__label {
-    min-width: 120px; /* 设置 label 的固定宽度 */
+    min-width: 120px;
+    /* 设置 label 的固定宽度 */
 }
 
 /* 使输入框和按钮水平排列 */
 .productapp_content .el-form-item .el-input,
 .productapp_content .el-form-item .el-button {
-    margin-left: 10px; /* 控制输入框和按钮之间的间距 */
+    margin-left: 10px;
+    /* 控制输入框和按钮之间的间距 */
 }
+
 .el-form-item__content {
     display: flex;
     margin-left: 0 !important;
@@ -1200,44 +1251,55 @@ export default {
     justify-content: space-between;
     height: 60px;
 }
+
 .main {
     margin-top: 40px;
 }
+
 .headerBg {
     background: #eee !important;
 }
+
 .el-input--mini .el-input__inner {
     height: 35px;
     line-height: 28px;
 }
+
 .headers {
     display: flex;
     height: 60px;
 }
+
 .title {
     font-size: 28px;
     font: 800;
     color: #000;
     margin-right: 100px;
 }
+
 .product_selectbox {
     display: flex;
 }
+
 .setbox {
     margin-left: 460px;
     margin-right: 80px;
 }
+
 .close {
     width: 28px;
     height: 28px;
     cursor: pointer;
 }
+
 /* 禁用 el-upload 组件图片的渐变效果 */
 .el-upload-list__item {
-    transition: none !important; /* 取消所有过渡动画 */
+    transition: none !important;
+    /* 取消所有过渡动画 */
 }
 
 .el-upload-list__item img {
-    opacity: 1 !important; /* 保持图片不透明 */
+    opacity: 1 !important;
+    /* 保持图片不透明 */
 }
 </style>
