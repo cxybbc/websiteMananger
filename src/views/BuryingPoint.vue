@@ -1,8 +1,13 @@
 <template>
     <div class="b_p_view">
-        <div style="padding: 10px 0">
+        <div style="padding: 10px 0;display: flex;align-items: center;column-gap: 20px;">
             <el-button type="primary" @click="exportData">数据导出<i class="el-icon-circle-plus-outline"></i></el-button>
+            <el-input v-model="searchForm.webName" placeholder="请输入国内站点" style="width: 200px;"></el-input>
+            <el-date-picker v-model="searchForm.date" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
+                value-format="yyyy-MM-dd" />
+            <el-button type="primary" @click="searchData">查询</el-button>
         </div>
+
         <el-table :data="tableData" style="width: 100%" border stripe :header-cell-class-name="'headerBg'"
             @filter-change="handleFilterButton" @sort-change="sortChange">
             <!-- <el-table-column prop="userIp" label="用户IP" width="150" align="center" sortable="custom"></el-table-column> -->
@@ -27,6 +32,10 @@
     export default {
         data() {
             return {
+                searchForm: {
+                    webName: '',
+                    date: []
+                },
                 pageNum: 1,
                 pageSize: 30,
                 total: 0,
@@ -70,6 +79,11 @@
             this.loadDates()
         },
         methods: {
+
+
+            search() {
+                console.log('日期筛选', this.searchForm.date);
+            },
             load() {
                 this.request
                     .post('/buryingPoint/getBuryingPoint', {
@@ -122,17 +136,34 @@
                 return row[property] && row[property].toString().includes(value)
             },
             searchData() {
+
+
+                console.log('搜索参数', {
+                    pageNum: this.pageNum,
+                    pageSize: this.pageSize,
+                    webNames: this.webNameList,
+                    createTimes: this.createTimeList,
+                    websiteName: this.searchForm.webName,
+                    startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
+                    endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : ''
+                });
                 this.request
                     .post('/buryingPoint/getBuryingPoint', {
                         pageNum: this.pageNum,
                         pageSize: this.pageSize,
                         webNames: this.webNameList,
-                        createTimes: this.createTimeList
+                        createTimes: this.createTimeList,
+                        websiteName: this.searchForm.webName,
+                        startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
+                        endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : ''
                     })
                     .then(res => {
+                        console.log('res', res);
                         this.tableData = res.data.result.records
                         this.total = res.data.result.total
                         this.summaryList(this.webNameList, this.createTimeList)
+                    }).catch(err => {
+                        console.log('搜索失败', err);
                     })
             },
             sortChange() { },
@@ -161,14 +192,18 @@
                     lock: true, //lock的修改符--默认是false
                     text: '数据导出中，请稍候...', //显示在加载图标下方的加载文案
                     background: 'rgba(0,0,0,0.8)', //遮罩层颜色
-                    spinner: 'el-icon-loading' //自定义加载图标类名
+                    spinner: 'el-icon-loading', //自定义加载图标类名
+
                 })
                 this.request
                     .post(
                         '/buryingPoint/exportData',
                         {
                             webNames: this.webNameList,
-                            createTimes: this.createTimeList
+                            createTimes: this.createTimeList,
+                            startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
+                            endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : '',
+                            websiteName: this.searchForm.webName,
                         },
                         { responseType: 'blob' }
                     )

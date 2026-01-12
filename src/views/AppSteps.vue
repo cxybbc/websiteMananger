@@ -19,7 +19,16 @@
             <el-table-column prop="stepsTitle" label="教程步骤标题" width="150" align="center"></el-table-column>
             <el-table-column prop="stepsText" label="教程步骤文本" width="150" align="center"></el-table-column>
             <el-table-column prop="stepsIndex" label="教程步骤序号" width="150" align="center"></el-table-column>
-            <el-table-column prop="infoContent" label="教程步骤详情" width="150" align="center"></el-table-column>
+            <el-table-column prop="infoContent" label="教程步骤详情" width="150" align="center">
+
+
+                <template #default="scope">
+                    <div
+                        style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical;">
+                        {{ scope.row.infoContent }}
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column prop="pointTitle" label="布局点" width="150" align="center"></el-table-column>
             <el-table-column prop="stepsAvaurl" label="详情图" width="150" align="center">
                 <template slot-scope="scope">
@@ -81,6 +90,18 @@
                     trigger: 'blur'
                 }">
                     <el-input v-model="form.stepsTitle" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="新闻路由地址">
+                    <el-input v-model="form.textMeaning" placeholder="请输入新闻路由地址"></el-input>
+                </el-form-item>
+                <el-form-item label="网页标题">
+                    <el-input v-model="form.pageTitle" placeholder="请输入网页标题"></el-input>
+                </el-form-item>
+                <el-form-item label="网页描述">
+                    <el-input v-model="form.metaDescription" placeholder="请输入网页meta描述"></el-input>
+                </el-form-item>
+                <el-form-item label="结构化数据">
+                    <el-input type="textarea" autosize v-model="form.jsonStr" placeholder="请输入网页结构化数据"></el-input>
                 </el-form-item>
                 <el-form-item label="教程步骤文本" prop="stepsText" :rules="{
                     required: false,
@@ -185,6 +206,18 @@
                     trigger: 'blur'
                 }">
                     <el-input v-model="form.stepsTitle" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="新闻路由地址">
+                    <el-input v-model="form.textMeaning" placeholder="请输入新闻路由地址"></el-input>
+                </el-form-item>
+                <el-form-item label="网页标题">
+                    <el-input v-model="form.pageTitle" placeholder="请输入网页标题"></el-input>
+                </el-form-item>
+                <el-form-item label="网页描述">
+                    <el-input v-model="form.metaDescription" placeholder="请输入网页meta描述"></el-input>
+                </el-form-item>
+                <el-form-item label="结构化数据">
+                    <el-input type="textarea" autosize v-model="form.jsonStr" placeholder="请输入网页结构化数据"></el-input>
                 </el-form-item>
                 <el-form-item label="步骤文本" prop="stepsText" :rules="{
                     required: false,
@@ -314,7 +347,29 @@ export default {
                 functionId: '',
                 stepsHTitle: '',
                 infoContent: '',
-                pointId: ''
+                pointId: '',
+                textMeaning: '',
+                pageTitle: '',
+                metaDescription: '',
+                jsonStr: `{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": ""
+  },
+  "headline": "",
+  "description": "",
+  "keywords": "",
+  "image": "",
+  "author": {
+    "@type": "Person",
+    "name": ""
+  },
+  "datePublished": "",
+  "dateModified": ""
+}
+`
             },
             dialogFormVisible: false,
             dialogFormVisible1: false,
@@ -548,7 +603,10 @@ export default {
             })
         },
         handleEdit(row) {
+
+
             this.form = JSON.parse(JSON.stringify(row))
+            console.log('编辑信息', this.form);
             this.changeAppWebsiteId(row.appWebsiteId)
             this.image = this.form.navigationIcon
             this.currentId = this.form.id
@@ -575,7 +633,27 @@ export default {
         handleAdd() {
             this.dialogFormVisible = true
             this.pointList.splice(0, this.pointList.length)
-            this.form = {}
+            this.form = {
+                jsonStr: `{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": ""
+  },
+  "headline": "",
+  "description": "",
+  "keywords": "",
+  "image": "",
+  "author": {
+    "@type": "Person",
+    "name": ""
+  },
+  "datePublished": "",
+  "dateModified": ""
+}
+`
+            }
         },
         handleSizeChange(pageSize) {
             this.pageSize = pageSize
