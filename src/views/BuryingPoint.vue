@@ -269,7 +269,7 @@ export default {
 
             })
             console.log('参数', {
-                webNames: this.searchForm.webName,
+                webNames: this.webNameList,
                 createTimes: this.createTimeList,
                 startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
                 endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : '',
@@ -279,7 +279,7 @@ export default {
                 .post(
                     '/buryingPoint/exportData',
                     {
-                        webNames: this.searchForm.webName,
+                        webNames: this.webNameList,
                         createTimes: this.createTimeList,
                         startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
                         endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : '',
