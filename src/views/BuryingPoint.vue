@@ -269,21 +269,21 @@ export default {
 
             })
             console.log('参数', {
-                webNames: this.webNameList,
-                createTimes: this.createTimeList,
+                webNames: this.searchForm.appId,
+                // createTimes: this.createTimeList,
+                functionNames: this.searchForm.webName,
                 startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
                 endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : '',
-                websiteName: this.searchForm.webName,
             });
             this.request
                 .post(
                     '/buryingPoint/exportData',
                     {
-                        webNames: this.webNameList,
-                        createTimes: this.createTimeList,
+                        webNames: this.searchForm.appId,
+                        // createTimes: this.createTimeList,
+                        functionNames: this.searchForm.webName,
                         startTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[0] : '',
                         endTime: Array.isArray(this.searchForm.date) ? this.searchForm.date[1] : '',
-                        websiteName: this.searchForm.webName,
                     },
                     { responseType: 'blob' }
                 )
