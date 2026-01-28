@@ -319,39 +319,39 @@
 </template>
 
 <script>
-    import { serverIp } from '../../public/config'
-    import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-    import request from '@/utils/request'
-    import { Boot, createEditor, createToolbar } from '@wangeditor/editor'
-    import { editorConfig, initImageEvents } from '@/utils/editor/menus'
-    export default {
-        name: 'User',
-        components: { Editor, Toolbar },
-        data() {
-            return {
-                serverIp: serverIp,
-                tableData: [],
-                total: 0,
-                pageNum: 1,
-                pageSize: 10,
-                username: '',
-                form: {
-                    id: '',
-                    stepsTitle: '',
-                    stepsAvaurl: '',
-                    stepsText: '',
-                    stepsIndex: '',
-                    appWebsiteId: '',
-                    applicationCategory: '',
-                    regionCategory: '',
-                    functionId: '',
-                    stepsHTitle: '',
-                    infoContent: '',
-                    pointId: '',
-                    textMeaning: '',
-                    pageTitle: '',
-                    metaDescription: '',
-                    jsonStr: `{
+import { serverIp } from '../../public/config'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import request from '@/utils/request'
+import { Boot, createEditor, createToolbar } from '@wangeditor/editor'
+import { editorConfig, initImageEvents } from '@/utils/editor/menus'
+export default {
+    name: 'User',
+    components: { Editor, Toolbar },
+    data() {
+        return {
+            serverIp: serverIp,
+            tableData: [],
+            total: 0,
+            pageNum: 1,
+            pageSize: 10,
+            username: '',
+            form: {
+                id: '',
+                stepsTitle: '',
+                stepsAvaurl: '',
+                stepsText: '',
+                stepsIndex: '',
+                appWebsiteId: '',
+                applicationCategory: '',
+                regionCategory: '',
+                functionId: '',
+                stepsHTitle: '',
+                infoContent: '',
+                pointId: '',
+                textMeaning: '',
+                pageTitle: '',
+                metaDescription: '',
+                jsonStr: `{
   "@context": "https://schema.org",
   "@type": "Article",
   "mainEntityOfPage": {
@@ -370,271 +370,271 @@
   "dateModified": ""
 }
 `
+            },
+            dialogFormVisible: false,
+            dialogFormVisible1: false,
+            multipleSelection: [],
+            appList: [],
+            fileList: [],
+            functionList: [],
+            functionListCopy: [],
+            base64Img: '',
+            image: '',
+            itemKey: '',
+            uploadProgress: 0,
+            uploadData: true,
+            currentId: '',
+            acList: [
+                {
+                    id: 0,
+                    label: 'web端'
                 },
-                dialogFormVisible: false,
-                dialogFormVisible1: false,
-                multipleSelection: [],
-                appList: [],
-                fileList: [],
-                functionList: [],
-                functionListCopy: [],
-                base64Img: '',
-                image: '',
-                itemKey: '',
-                uploadProgress: 0,
-                uploadData: true,
-                currentId: '',
-                acList: [
-                    {
-                        id: 0,
-                        label: 'web端'
-                    },
-                    {
-                        id: 1,
-                        label: '移动端'
+                {
+                    id: 1,
+                    label: '移动端'
+                }
+            ],
+            rcList: [
+                {
+                    id: 0,
+                    label: '国内'
+                },
+                {
+                    id: 1,
+                    label: '国外'
+                }
+            ],
+            pointList: [],
+            editorRef: null,
+            editorRef2: null,
+            toolbarConfig: {
+                mode: 'simple'
+            },
+            toolbarConfig2: {
+                mode: 'simple'
+            },
+            editorConfig: {
+                placeholder: '请输入内容',
+                MENU_CONF: {}
+
+                // 开启图片点击后的工具栏
+            },
+            editorConfig2: {
+                placeholder: '请输入内容',
+                MENU_CONF: {}
+            }
+        }
+    },
+    watch: {
+        username(newVal) {
+            if (newVal != undefined && newVal != '') {
+                this.pageNum = 1
+            }
+        }
+    },
+    created() {
+        //请求分页查询数据
+        this.load()
+    },
+    watch: {
+        form: {
+            handler: function (val) {
+                console.log('???', val.appWebsiteId, this.functionList)
+
+                this.functionListCopy = this.functionList.filter(obj => obj.appWebSiteId == val.appWebsiteId)
+                console.log('???', this.functionListCopy)
+
+                // if (this.functionListCopy.length > 0) {
+                //     this.form.functionId = this.functionListCopy[0].id
+                // } else {
+                //     this.form.functionId = ""
+                // }
+            },
+            deep: true //对象的深度验证
+        }
+    },
+    computed: {
+        selectTag() {
+            return function (value) {
+                const matchedObject = this.appList.find(obj => obj.id == value)
+                return matchedObject ? matchedObject.webSiteName : ''
+            }
+        },
+        selectTag1() {
+            return function (value) {
+                const matchedObject = this.functionList.find(obj => obj.id == value)
+                return matchedObject ? matchedObject.functionName : ''
+            }
+        },
+        seleteFunctionId() {
+            return function (value) {
+                const matchedObject = this.functionList.find(obj => obj.appWebsiteId == value)
+                return matchedObject ? matchedObject.webSiteName : ''
+            }
+        }
+    },
+    methods: {
+        handleCreated2(editor) {
+            this.editorRef2 = Object.seal(editor)
+        },
+        handleCreated(editor) {
+            this.editorRef = Object.seal(editor)
+            console.log('this.editorRef', editor)
+            initImageEvents(editor)
+            // 2. 注册自定义菜单
+        },
+        handleChange(editor) {
+            const htmlContent = editor.getHtml()
+            console.log('输入', htmlContent)
+        },
+        handleDestroyed(editor) { },
+        handleFocus(editor) {
+            console.log('获取焦点')
+        },
+        handleBlur(editor) {
+            console.log('失去焦点')
+        },
+        load() {
+            this.request
+                .get('/stepsManage/stepsList', {
+                    params: {
+                        pageNum: this.pageNum,
+                        pageSize: this.pageSize
                     }
-                ],
-                rcList: [
-                    {
-                        id: 0,
-                        label: '国内'
-                    },
-                    {
-                        id: 1,
-                        label: '国外'
-                    }
-                ],
-                pointList: [],
-                editorRef: null,
-                editorRef2: null,
-                toolbarConfig: {
-                    mode: 'simple'
-                },
-                toolbarConfig2: {
-                    mode: 'simple'
-                },
-                editorConfig: {
-                    placeholder: '请输入内容',
-                    MENU_CONF: {}
-
-                    // 开启图片点击后的工具栏
-                },
-                editorConfig2: {
-                    placeholder: '请输入内容',
-                    MENU_CONF: {}
-                }
-            }
-        },
-        watch: {
-            username(newVal) {
-                if (newVal != undefined && newVal != '') {
-                    this.pageNum = 1
-                }
-            }
-        },
-        created() {
-            //请求分页查询数据
-            this.load()
-        },
-        watch: {
-            form: {
-                handler: function (val) {
-                    console.log('???', val.appWebsiteId, this.functionList)
-
-                    this.functionListCopy = this.functionList.filter(obj => obj.appWebSiteId == val.appWebsiteId)
-                    console.log('???', this.functionListCopy)
-
-                    // if (this.functionListCopy.length > 0) {
-                    //     this.form.functionId = this.functionListCopy[0].id
-                    // } else {
-                    //     this.form.functionId = ""
-                    // }
-                },
-                deep: true //对象的深度验证
-            }
-        },
-        computed: {
-            selectTag() {
-                return function (value) {
-                    const matchedObject = this.appList.find(obj => obj.id == value)
-                    return matchedObject ? matchedObject.webSiteName : ''
-                }
-            },
-            selectTag1() {
-                return function (value) {
-                    const matchedObject = this.functionList.find(obj => obj.id == value)
-                    return matchedObject ? matchedObject.functionName : ''
-                }
-            },
-            seleteFunctionId() {
-                return function (value) {
-                    const matchedObject = this.functionList.find(obj => obj.appWebsiteId == value)
-                    return matchedObject ? matchedObject.webSiteName : ''
-                }
-            }
-        },
-        methods: {
-            handleCreated2(editor) {
-                this.editorRef2 = Object.seal(editor)
-            },
-            handleCreated(editor) {
-                this.editorRef = Object.seal(editor)
-                console.log('this.editorRef', editor)
-                initImageEvents(editor)
-                // 2. 注册自定义菜单
-            },
-            handleChange(editor) {
-                const htmlContent = editor.getHtml()
-                console.log('输入', htmlContent)
-            },
-            handleDestroyed(editor) { },
-            handleFocus(editor) {
-                console.log('获取焦点')
-            },
-            handleBlur(editor) {
-                console.log('失去焦点')
-            },
-            load() {
-                this.request
-                    .get('/stepsManage/stepsList', {
-                        params: {
-                            pageNum: this.pageNum,
-                            pageSize: this.pageSize
-                        }
-                    })
-                    .then(res => {
-                        console.log('教程数据', res)
-                        this.itemKey = Math.random()
-                        this.tableData = res.data.stepsList.records
-                        this.total = res.data.stepsList.total
-                    })
-                this.request.get('/appManage/appManages').then(res => {
-                    this.appList = res.data.appList
                 })
-                this.request.get('/functionManage/functionLists').then(res => {
-                    this.functionList = res.data.functionLists
+                .then(res => {
+                    console.log('教程数据', res)
+                    this.itemKey = Math.random()
+                    this.tableData = res.data.stepsList.records
+                    this.total = res.data.stepsList.total
                 })
-            },
-            save() {
-                this.$refs.addForm.validate(valid => {
-                    if (valid) {
-                        if (this.base64Img) {
-                            this.form['stepsAvaurl'] = this.base64Img
-                        } else {
-                            this.form['stepsAvaurl'] = this.form.stepsAvaurl
-                        }
-                        console.log('当前新增参数', this.form)
-
-                        this.request.post('/stepsManage/saveSteps', this.form).then(res => {
-                            console.log(res)
-
-                            if (res.code === '200') {
-                                this.$message.success('保存成功')
-                                this.dialogFormVisible = false
-                                this.$refs.upload.clearFiles()
-                                if (this.username) {
-                                    this.search()
-                                } else {
-                                    this.load()
-                                }
-                                this.form = {}
-                                this.base64Img = ''
-                                this.image = ''
-                            } else {
-                                this.$message.error('保存失败')
-                            }
-                        })
+            this.request.get('/appManage/appManages').then(res => {
+                this.appList = res.data.appList
+            })
+            this.request.get('/functionManage/functionLists').then(res => {
+                this.functionList = res.data.functionLists
+            })
+        },
+        save() {
+            this.$refs.addForm.validate(valid => {
+                if (valid) {
+                    if (this.base64Img) {
+                        this.form['stepsAvaurl'] = this.base64Img
                     } else {
+                        this.form['stepsAvaurl'] = this.form.stepsAvaurl
                     }
-                })
-            },
-            edit() {
-                this.$refs.editForm.validate(valid => {
-                    if (valid) {
-                        if (this.base64Img) {
-                            this.uploadData = false
-                            this.form['stepsAvaurl'] = this.base64Img
-                        } else {
-                            this.form['stepsAvaurl'] = this.form.stepsAvaurl
-                        }
-                        this.dialogFormVisible1 = false
-                        console.log('当前编辑参数', this.form)
+                    console.log('当前新增参数', this.form)
 
-                        this.request.post('/stepsManage/saveSteps', this.form).then(res => {
-                            if (res.code === '200') {
-                                this.uploadProgress = 100
-                                this.uploadData = true
-                                this.$message.success('保存成功')
-                                this.dialogFormVisible1 = false
-                                this.$refs.upload.clearFiles()
-                                if (this.username) {
-                                    this.search()
-                                } else {
-                                    this.load()
-                                }
-                                this.form = {}
-                                this.base64Img = ''
-                                this.image = ''
-                                this.infoContent = ''
-                            } else {
-                                this.$message.error('保存失败')
-                            }
-                        })
-                    } else {
-                    }
-                })
-            },
-            reset() {
-                this.username = ''
-                this.load()
-            },
-            handleSelectionChange(val) {
-                this.multipleSelection = val
-            },
-            deleteBatch() {
-                let ids = this.multipleSelection.map(v => v.id) // 因为后端的是List数组 而这ids是对象数组 所以要用前端的map(v => v.id)把对象数组 [{},{},{}] 转变成纯id的数组 [1,2,3,...]
-                this.request.post('/user/del/batch/', ids).then(res => {
-                    if (res.code === '200') {
-                        this.$message.success('批量删除成功')
-                        this.load()
-                    } else {
-                        this.$message.error('批量删除失败')
-                    }
-                })
-            },
-            handleEdit(row) {
+                    this.request.post('/stepsManage/saveSteps', this.form).then(res => {
+                        console.log(res)
 
-
-                this.form = JSON.parse(JSON.stringify(row))
-                console.log('编辑信息', this.form);
-                this.changeAppWebsiteId(row.appWebsiteId)
-                this.image = this.form.navigationIcon
-                this.currentId = this.form.id
-                this.dialogFormVisible1 = true
-            },
-            handleDelete(id) {
-                this.request
-                    .post('/stepsManage/deleteSteps', {
-                        id
-                    })
-                    .then(res => {
                         if (res.code === '200') {
-                            this.$message.success('删除成功')
+                            this.$message.success('保存成功')
+                            this.dialogFormVisible = false
+                            this.$refs.upload.clearFiles()
                             if (this.username) {
                                 this.search()
                             } else {
                                 this.load()
                             }
+                            this.form = {}
+                            this.base64Img = ''
+                            this.image = ''
                         } else {
-                            this.$message.error('删除失败')
+                            this.$message.error('保存失败')
                         }
                     })
-            },
-            handleAdd() {
-                this.dialogFormVisible = true
-                this.pointList.splice(0, this.pointList.length)
-                this.form = {
-                    jsonStr: `{
+                } else {
+                }
+            })
+        },
+        edit() {
+            this.$refs.editForm.validate(valid => {
+                if (valid) {
+                    if (this.base64Img) {
+                        this.uploadData = false
+                        this.form['stepsAvaurl'] = this.base64Img
+                    } else {
+                        this.form['stepsAvaurl'] = this.form.stepsAvaurl
+                    }
+                    this.dialogFormVisible1 = false
+                    console.log('当前编辑参数', this.form)
+
+                    this.request.post('/stepsManage/saveSteps', this.form).then(res => {
+                        if (res.code === '200') {
+                            this.uploadProgress = 100
+                            this.uploadData = true
+                            this.$message.success('保存成功')
+                            this.dialogFormVisible1 = false
+                            this.$refs.upload.clearFiles()
+                            if (this.username) {
+                                this.search()
+                            } else {
+                                this.load()
+                            }
+                            this.form = {}
+                            this.base64Img = ''
+                            this.image = ''
+                            this.infoContent = ''
+                        } else {
+                            this.$message.error('保存失败')
+                        }
+                    })
+                } else {
+                }
+            })
+        },
+        reset() {
+            this.username = ''
+            this.load()
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val
+        },
+        deleteBatch() {
+            let ids = this.multipleSelection.map(v => v.id) // 因为后端的是List数组 而这ids是对象数组 所以要用前端的map(v => v.id)把对象数组 [{},{},{}] 转变成纯id的数组 [1,2,3,...]
+            this.request.post('/user/del/batch/', ids).then(res => {
+                if (res.code === '200') {
+                    this.$message.success('批量删除成功')
+                    this.load()
+                } else {
+                    this.$message.error('批量删除失败')
+                }
+            })
+        },
+        handleEdit(row) {
+
+
+            this.form = JSON.parse(JSON.stringify(row))
+            console.log('编辑信息', this.form);
+            this.changeAppWebsiteId(row.appWebsiteId)
+            this.image = this.form.navigationIcon
+            this.currentId = this.form.id
+            this.dialogFormVisible1 = true
+        },
+        handleDelete(id) {
+            this.request
+                .post('/stepsManage/deleteSteps', {
+                    id
+                })
+                .then(res => {
+                    if (res.code === '200') {
+                        this.$message.success('删除成功')
+                        if (this.username) {
+                            this.search()
+                        } else {
+                            this.load()
+                        }
+                    } else {
+                        this.$message.error('删除失败')
+                    }
+                })
+        },
+        handleAdd() {
+            this.dialogFormVisible = true
+            this.pointList.splice(0, this.pointList.length)
+            this.form = {
+                jsonStr: `{
   "@context": "https://schema.org",
   "@type": "Article",
   "mainEntityOfPage": {
@@ -653,129 +653,129 @@
   "dateModified": ""
 }
 `
-                }
-            },
-            handleSizeChange(pageSize) {
-                this.pageSize = pageSize
-                if (this.username != undefined && this.username != '') {
-                    this.search()
-                } else {
-                    this.load()
-                }
-            },
-            handleCurrentChange(pageNum) {
-                this.pageNum = pageNum
-                if (this.username != undefined && this.username != '') {
-                    this.search()
-                } else {
-                    this.load()
-                }
-            },
-            async handlePreview(file) {
-                this.base64Img = await this.fileToBase64(file.raw).then(res => {
-                    return res
-                })
-            },
-            handleRemove(file, fileList) {
-                this.base64Img = ''
-            },
-            fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader()
-                    reader.readAsDataURL(file)
-                    reader.onload = function () {
-                        const base64String = reader.result.split(',')[1]
-                        resolve(base64String)
-                    }
-                    // 加载失败时
-                    reader.onerror = function () {
-                        reject(new Error('Failed to load file'))
-                    }
-                })
-            },
-            search() {
-                this.request
-                    .post('/stepsManage/searchSteps', {
-                        pageNum: this.pageNum,
-                        pageSize: this.pageSize,
-                        appWebsiteId: this.username
-                    })
-                    .then(res => {
-                        this.tableData = res.data.searchData.records
-                        this.total = res.data.searchData.total
-                    })
-                this.request.get('/appManage/appManages').then(res => {
-                    this.appList = res.data.appList
-                })
-            },
-
-            //选择所属官网 , 进行搜索相应布局点
-            changeAppWebsiteId(value) {
-                const params = {
-                    pageNum: '1',
-                    pageSize: '100',
-                    appWebsiteId: value
-                }
-                console.log('布局点搜索参数', params)
-
-                this.request.get('/stepsPoint/searchPoint', { params }).then(res => {
-                    console.log('布局点数据', res)
-                    //提取出所选官网的布局点
-                    if (res.code == '200') {
-                        this.pointList = res.data.pointList.records
-                    }
-                })
             }
         },
-        mounted() {
-            this.editorConfig.MENU_CONF['uploadImage'] = {
-                async customUpload(file, insertFn) {
-                    const formData = new FormData()
-                    formData.append('file', file)
-                    try {
-                        const res = await request.post('/stepsManage/upload', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                token: localStorage.getItem('user').token
-                            }
-                        })
-                        console.log('上传图片', res)
-                        if (res.code == 200) {
-                            const url = '//' + res.data.url
-                            insertFn(url)
-                            this.$message.success('上传成功')
-                        } else {
-                            this.$message.error('上传失败')
+        handleSizeChange(pageSize) {
+            this.pageSize = pageSize
+            if (this.username != undefined && this.username != '') {
+                this.search()
+            } else {
+                this.load()
+            }
+        },
+        handleCurrentChange(pageNum) {
+            this.pageNum = pageNum
+            if (this.username != undefined && this.username != '') {
+                this.search()
+            } else {
+                this.load()
+            }
+        },
+        async handlePreview(file) {
+            this.base64Img = await this.fileToBase64(file.raw).then(res => {
+                return res
+            })
+        },
+        handleRemove(file, fileList) {
+            this.base64Img = ''
+        },
+        fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.readAsDataURL(file)
+                reader.onload = function () {
+                    const base64String = reader.result.split(',')[1]
+                    resolve(base64String)
+                }
+                // 加载失败时
+                reader.onerror = function () {
+                    reject(new Error('Failed to load file'))
+                }
+            })
+        },
+        search() {
+            this.request
+                .post('/stepsManage/searchSteps', {
+                    pageNum: this.pageNum,
+                    pageSize: this.pageSize,
+                    appWebsiteId: this.username
+                })
+                .then(res => {
+                    this.tableData = res.data.searchData.records
+                    this.total = res.data.searchData.total
+                })
+            this.request.get('/appManage/appManages').then(res => {
+                this.appList = res.data.appList
+            })
+        },
+
+        //选择所属官网 , 进行搜索相应布局点
+        changeAppWebsiteId(value) {
+            const params = {
+                pageNum: '1',
+                pageSize: '100',
+                appWebsiteId: value
+            }
+            console.log('布局点搜索参数', params)
+
+            this.request.get('/stepsPoint/searchPoint', { params }).then(res => {
+                console.log('布局点数据', res)
+                //提取出所选官网的布局点
+                if (res.code == '200') {
+                    this.pointList = res.data.pointList.records
+                }
+            })
+        }
+    },
+    mounted() {
+        this.editorConfig.MENU_CONF['uploadImage'] = {
+            async customUpload(file, insertFn) {
+                const formData = new FormData()
+                formData.append('file', file)
+                try {
+                    const res = await request.post('/stepsManage/upload', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            token: localStorage.getItem('user').token
                         }
-                    } catch (err) {
-                        console.log(err)
+                    })
+                    console.log('上传图片', res)
+                    if (res.code == 200) {
+                        const url = '//' + res.data.url
+                        insertFn(url)
+                        this.$message.success('上传成功')
+                    } else {
+                        this.$message.error('上传失败')
                     }
+                } catch (err) {
+                    console.log(err)
                 }
             }
         }
     }
+}
 </script>
 
 <style>
-    @import '@wangeditor/editor/dist/css/style.css';
+@import '@wangeditor/editor/dist/css/style.css';
 
-    .headerBg {
-        background: #eee !important;
-    }
+.headerBg {
+    background: #eee !important;
+}
 
-    .el-table__header {
-        width: 100% !important;
-    }
+.el-table__header {
+    width: 100% !important;
+}
 
-    .el-table__body {
-        width: 100% !important;
-    }
+.el-table__body {
+    width: 100% !important;
+}
 
-    .el-form-item__label {
-        width: 100px !important;
-    }
+.el-form-item__label {
+    width: 100px !important;
+}
 
-    .el-form-item__content {
-        margin-left: 100px !important;
-    }
+.el-form-item__content {
+    margin-left: 100px !important;
+}
 </style>
