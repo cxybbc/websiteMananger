@@ -1,51 +1,48 @@
-import axios from 'axios'
+import axios from "axios";
 import ElementUI from "element-ui";
 import router from "@/router/index.js";
 const request = axios.create({
-    baseURL: 'https://websitemanage.biggerlens.cn:18060'
-    // baseURL: 'http://192.168.31.36:18061'
-})
-
-
-
-request.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';
-    let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
-    if (user) {
-        config.headers['token'] = user.token;  // 设置请求头
-    }
-    return config
-}, error => {
-    return Promise.reject(error)
+	//baseURL: "https://websitemanage.biggerlens.cn:18060",
+	baseURL: "http://192.168.31.181:18061",
 });
 
-
-
+request.interceptors.request.use(
+	(config) => {
+		config.headers["Content-Type"] = "application/json;charset=utf-8";
+		let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+		if (user) {
+			config.headers["token"] = user.token; // 设置请求头
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
 
 // response 拦截器
 
 request.interceptors.response.use(
-    response => {
-        let res = response.data;
-        // 如果是返回的文件
-        if (response.config.responseType === 'blob') {
-            return res
-        }
-        // 兼容服务端返回的字符串数据
-        if (typeof res === 'string') {
-            res = res ? JSON.parse(res) : res
-        }
-        //当权限验证不通过时候给出提示
-        if (res.code === '401') {
-            localStorage.removeItem("user")
-            router.push("/login");
-        }
-        return res;
-    },
-    error => {
-        return Promise.reject(error)
-    }
-)
+	(response) => {
+		let res = response.data;
+		// 如果是返回的文件
+		if (response.config.responseType === "blob") {
+			return res;
+		}
+		// 兼容服务端返回的字符串数据
+		if (typeof res === "string") {
+			res = res ? JSON.parse(res) : res;
+		}
+		//当权限验证不通过时候给出提示
+		if (res.code === "401") {
+			localStorage.removeItem("user");
+			router.push("/login");
+		}
+		return res;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
 
-
-export default request
+export default request;
